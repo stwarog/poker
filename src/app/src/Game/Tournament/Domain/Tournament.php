@@ -11,10 +11,15 @@ class Tournament
 
     /** @var Player[] */
     private array $players = [];
+    /**
+     * @var Rules|null
+     */
+    private ?Rules $rules;
 
-    public function __construct(?TournamentStatus $status = null)
+    public function __construct(?Rules $rules = null)
     {
-        $this->status = $status ?? TournamentStatus::PENDING();
+        $this->status = TournamentStatus::PENDING();
+        $this->rules = $rules ?? Rules::createDefaults();
     }
 
     public function getStatus(): TournamentStatus
