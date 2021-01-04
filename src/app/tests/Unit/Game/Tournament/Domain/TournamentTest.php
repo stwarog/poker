@@ -11,6 +11,7 @@ use App\Game\Tournament\Domain\Tournament;
 use App\Game\Tournament\Domain\TournamentSpecificationInterface;
 use App\Game\Tournament\Domain\TournamentStatus;
 use Exception;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -94,11 +95,11 @@ class TournamentTest extends TestCase
     }
 
     /** @test */
-    public function signUp__on_ready_tournament_throws_exception(): void
+    public function signUp__has_max_required_players_exceeded__throws_invalid_argument_exception(): void
     {
-        // Except
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Tournament sign up is closed');
+        // Expect
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Tournament has already full amount of players');
 
         // Given
         $player1       = new Player();
@@ -107,11 +108,32 @@ class TournamentTest extends TestCase
         $expectedCount = 2;
 
         // When
-        $r = new Rules(new PlayerCount($expectedCount));
+        $r = new Rules(new PlayerCount(2, $expectedCount));
         $t = new Tournament($r);
         $t->signUp($player1);
         $t->signUp($player2);
         $t->signUp($player3);
+    }
+
+    /** @test */
+    public function signUp__on_not_pending_or_ready_tournament_throws_exception(): void
+    {
+        // Except
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Tournament sign up is closed');
+
+        // Given
+        $player1       = new Player();
+        $player2       = new Player();
+        $expectedCount = 2;
+
+        // When
+        $r = new Rules(new PlayerCount($expectedCount));
+        $t = new Tournament($r);
+        $t->signUp($player1);
+        $t->signUp($player2);
+        $t->startTournament();
+        $t->signUp($player2);
     }
 
     /** @test */

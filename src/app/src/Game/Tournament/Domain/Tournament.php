@@ -4,6 +4,7 @@ namespace App\Game\Tournament\Domain;
 
 
 use Exception;
+use InvalidArgumentException;
 use RuntimeException;
 
 class Tournament
@@ -12,10 +13,7 @@ class Tournament
 
     /** @var Player[] */
     private array $players = [];
-    /**
-     * @var Rules|null
-     */
-    private ?Rules $rules;
+    private Rules $rules;
 
     public function __construct(?Rules $rules = null)
     {
@@ -40,8 +38,14 @@ class Tournament
      */
     public function signUp(Player $player): void
     {
-        if (false === $this->status->equals(TournamentStatus::PENDING())) {
+        $isPendingOrReady = $this->isReady() || $this->isPending();
+
+        if (false === $isPendingOrReady) {
             throw new Exception('Tournament sign up is closed');
+        }
+
+        if ($hasMaxPlayersCount = $this->playersCount() === $this->rules->getPlayerCount()->getMax()) {
+            throw new InvalidArgumentException(sprintf('Tournament has already full amount of players'));
         }
 
         if ($this->hasPlayer($player)) {
@@ -58,5 +62,20 @@ class Tournament
     private function hasPlayer(Player $player): bool
     {
         return !empty(array_filter($this->players, fn(Player $p) => $p->getId()->equals($player->getId())));
+    }
+
+    public function startTournament(): void
+    {
+        $this->status = TournamentStatus::STARTED();
+    }
+
+    private function isPending(): bool
+    {
+        return $this->status->equals(TournamentStatus::PENDING());
+    }
+
+    private function isReady(): bool
+    {
+        return $this->status->equals(TournamentStatus::READY());
     }
 }
