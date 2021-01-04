@@ -12,7 +12,10 @@ class Tournament
     private TournamentStatus $status;
 
     /** @var Player[] */
-    private array $players = [];
+    private array $participants = []; # signed up
+    /** @var Player[] */
+    private array $players = []; # joined to game
+
     private Rules $rules;
 
     public function __construct(?Rules $rules = null)
@@ -26,9 +29,9 @@ class Tournament
         return $this->status;
     }
 
-    public function playersCount(): int
+    public function participantCount(): int
     {
-        return count($this->players);
+        return count($this->participants);
     }
 
     /**
@@ -44,24 +47,24 @@ class Tournament
             throw new Exception('Tournament sign up is closed');
         }
 
-        if ($hasMaxPlayersCount = $this->playersCount() === $this->rules->getPlayerCount()->getMax()) {
-            throw new InvalidArgumentException(sprintf('Tournament has already full amount of players'));
+        if ($hasMaxPlayersCount = $this->participantCount() === $this->rules->getPlayerCount()->getMax()) {
+            throw new InvalidArgumentException(sprintf('Tournament has already full amount of participants'));
         }
 
-        if ($this->hasPlayer($player)) {
-            throw new RuntimeException('Player already registered to this tournament');
+        if ($this->hasParticipant($player)) {
+            throw new RuntimeException('Participant already registered to this tournament');
         }
 
-        $this->players[] = $player;
+        $this->participants[] = $player;
 
-        if ($isReadyToStart = $this->playersCount() >= $this->rules->getPlayerCount()->getMin()) {
+        if ($isReadyToStart = $this->participantCount() >= $this->rules->getPlayerCount()->getMin()) {
             $this->status = TournamentStatus::READY();
         }
     }
 
-    private function hasPlayer(Player $player): bool
+    private function hasParticipant(Player $player): bool
     {
-        return !empty(array_filter($this->players, fn(Player $p) => $p->getId()->equals($player->getId())));
+        return !empty(array_filter($this->participants, fn(Player $p) => $p->getId()->equals($player->getId())));
     }
 
     public function startTournament(): void
@@ -77,5 +80,16 @@ class Tournament
     private function isReady(): bool
     {
         return $this->status->equals(TournamentStatus::READY());
+    }
+
+    /**
+     * @param Player $player
+     * @throws RuntimeException
+     */
+    public function join(Player $player): void
+    {
+        if (false === $this->hasParticipant($player)) {
+            throw new RuntimeException('Can not join this tournament because is not signed up');
+        }
     }
 }
