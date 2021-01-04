@@ -5,7 +5,6 @@ namespace App\Tests\Unit\Game\Tournament\Application;
 use App\Game\Tournament\Application\TournamentSignUp;
 use App\Game\Tournament\Domain\PlayerByIdInterface;
 use App\Game\Tournament\Domain\TournamentByIdInterface;
-use App\Game\Tournament\Domain\TournamentSpecificationInterface;
 use PHPUnit\Framework\TestCase;
 
 class TournamentSignUpTest extends TestCase
@@ -17,8 +16,8 @@ class TournamentSignUpTest extends TestCase
     public function signUp__valid_tournament_and_player(): void
     {
         // Given
-        $tournamentId = 1;
-        $playerId = 1;
+        $tournamentId         = 1;
+        $playerId             = 1;
         $tournamentRepository = $this->createMock(TournamentByIdInterface::class);
         $tournamentRepository
             ->expects($this->once())
@@ -31,11 +30,8 @@ class TournamentSignUpTest extends TestCase
             ->method('getById')
             ->with($playerId);
 
-        $signUpSpecification = $this->createMock(TournamentSpecificationInterface::class);
-        $signUpSpecification->method('isSatisfiedBy')->willReturn(true);
-
         // When
-        $s = new TournamentSignUp($tournamentRepository, $playerRepository, $signUpSpecification);
+        $s = new TournamentSignUp($tournamentRepository, $playerRepository);
         $s->signUp($tournamentId, $playerId);
     }
 }

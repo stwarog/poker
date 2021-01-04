@@ -3,6 +3,7 @@
 namespace App\Game\Tournament\Domain;
 
 
+use Exception;
 use RuntimeException;
 
 class Tournament
@@ -19,7 +20,7 @@ class Tournament
     public function __construct(?Rules $rules = null)
     {
         $this->status = TournamentStatus::PENDING();
-        $this->rules = $rules ?? Rules::createDefaults();
+        $this->rules  = $rules ?? Rules::createDefaults();
     }
 
     public function getStatus(): TournamentStatus
@@ -32,10 +33,15 @@ class Tournament
         return count($this->players);
     }
 
-    public function signUp(Player $player, TournamentSpecificationInterface $joinSpecification): void
+    /**
+     * @param Player $player
+     *
+     * @throws Exception
+     */
+    public function signUp(Player $player): void
     {
-        if (false === $joinSpecification->isSatisfiedBy($this)) {
-            throw new RuntimeException('Tournament is not playable yet');
+        if (false === $this->status->equals(TournamentStatus::PENDING())) {
+            throw new Exception('Tournament sign up is closed');
         }
 
         if ($this->hasPlayer($player)) {
@@ -43,9 +49,13 @@ class Tournament
         }
 
         $this->players[] = $player;
+
+        if ($isReadyToStart = $this->playersCount() >= $this->rules->getPlayerCount()->getMin()) {
+            $this->status = TournamentStatus::READY();
+        }
     }
 
-    public function hasPlayer(Player $player): bool
+    private function hasPlayer(Player $player): bool
     {
         return !empty(array_filter($this->players, fn(Player $p) => $p->getId()->equals($player->getId())));
     }

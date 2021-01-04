@@ -21,4 +21,9 @@ class Rules
             new PlayerCount()
         );
     }
+
+    public function getPlayerCount(): PlayerCount
+    {
+        return new PlayerCount($this->minPlayerCount, $this->maxPlayerCount);
+    }
 }
