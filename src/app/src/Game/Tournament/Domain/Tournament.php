@@ -20,18 +20,8 @@ class Tournament
 
     public function __construct(?Rules $rules = null)
     {
-        $this->status = TournamentStatus::PENDING();
+        $this->status = TournamentStatus::PREPARATION();
         $this->rules  = $rules ?? Rules::createDefaults();
-    }
-
-    public function getStatus(): TournamentStatus
-    {
-        return $this->status;
-    }
-
-    public function participantCount(): int
-    {
-        return count($this->participants);
     }
 
     /**
@@ -41,9 +31,7 @@ class Tournament
      */
     public function signUp(Player $player): void
     {
-        $isPendingOrReady = $this->isReady() || $this->isPending();
-
-        if (false === $isPendingOrReady) {
+        if (false === $this->isReadyForSignUps()) {
             throw new Exception('Tournament sign up is closed');
         }
 
@@ -56,10 +44,16 @@ class Tournament
         }
 
         $this->participants[] = $player;
+    }
 
-        if ($isReadyToStart = $this->participantCount() >= $this->rules->getPlayerCount()->getMin()) {
-            $this->status = TournamentStatus::READY();
-        }
+    private function isReadyForSignUps(): bool
+    {
+        return $this->status->equals(TournamentStatus::SIGN_UPS());
+    }
+
+    public function participantCount(): int
+    {
+        return count($this->participants);
     }
 
     private function hasParticipant(Player $player): bool
@@ -72,18 +66,9 @@ class Tournament
         $this->status = TournamentStatus::STARTED();
     }
 
-    private function isPending(): bool
-    {
-        return $this->status->equals(TournamentStatus::PENDING());
-    }
-
-    private function isReady(): bool
-    {
-        return $this->status->equals(TournamentStatus::READY());
-    }
-
     /**
      * @param Player $player
+     *
      * @throws RuntimeException
      */
     public function join(Player $player): void
@@ -92,19 +77,59 @@ class Tournament
             throw new RuntimeException('Can not join this tournament because is not signed up');
         }
 
-        if (false === $this->isReady()) {
-            throw new RuntimeException('Tournament is not ready to play');
-        }
-
         if ($this->hasPlayer($player)) {
             throw new RuntimeException('Player already joined to this tournament');
         }
 
         $this->players[] = $player;
+
+        if ($isReadyToStart = $this->getPlayersCount() >= $this->rules->getPlayerCount()->getMin()) {
+            $this->status = TournamentStatus::READY();
+        }
     }
 
-    private function hasPlayer(Player $player): bool
+    public function hasPlayer(Player $player): bool
     {
         return !empty(array_filter($this->players, fn(Player $p) => $p->getId()->equals($player->getId())));
+    }
+
+    private function getPlayersCount(): int
+    {
+        return count($this->players);
+    }
+
+    public function start(): void
+    {
+        if (false === $this->isReady()) {
+            throw new RuntimeException('Tournament is not ready to start');
+        }
+    }
+
+    private function isReady(): bool
+    {
+        return $this->status->equals(TournamentStatus::READY());
+    }
+
+    public function leave(Player $player): void
+    {
+        if (false === $this->hasPlayer($player)) {
+            throw new InvalidArgumentException('Player is already out of this tournament');
+        }
+
+        $this->players = array_filter($this->players, fn(Player $p) => $p->getId()->notEquals($player->getId()));
+    }
+
+    public function publish(): void
+    {
+        if ($isNotUnderPreparation = false === $this->getStatus()->equals(TournamentStatus::PREPARATION())) {
+            throw new RuntimeException('Tournament must be in preparation status to get published');
+        }
+
+        $this->status = TournamentStatus::SIGN_UPS();
+    }
+
+    public function getStatus(): TournamentStatus
+    {
+        return $this->status;
     }
 }

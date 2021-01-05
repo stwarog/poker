@@ -15,14 +15,14 @@ class PlayerId
         $this->id = $id;
     }
 
-    public function id(): Uuid
-    {
-        return $this->id;
-    }
-
     public static function create(): self
     {
         return new self(Uuid::random());
+    }
+
+    public function id(): Uuid
+    {
+        return $this->id;
     }
 
     public function equals(self $id): bool
@@ -30,8 +30,13 @@ class PlayerId
         return $this->id->isEqual($id->id);
     }
 
+    public function notEquals(self $id): bool
+    {
+        return false === $this->id->isEqual($id->id);
+    }
+
     public function __toString()
     {
-        return (string)$this->id;
+        return (string) $this->id;
     }
 }

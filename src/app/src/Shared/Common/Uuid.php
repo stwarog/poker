@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Shared\Common;
 
+use InvalidArgumentException;
 use Ramsey\Uuid\Uuid as RamseyUuid;
+use function preg_match;
 
 final class Uuid
 {
@@ -12,8 +14,8 @@ final class Uuid
 
     public function __construct(string $value)
     {
-        if (!\preg_match('/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/', $value)) {
-            throw new \InvalidArgumentException('Invalid UUID format');
+        if (!preg_match('/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/', $value)) {
+            throw new InvalidArgumentException('Invalid UUID format');
         }
 
         $this->value = $value;
