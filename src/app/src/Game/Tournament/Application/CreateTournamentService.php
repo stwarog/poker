@@ -10,10 +10,14 @@ use App\Game\Tournament\Domain\Tournament;
 
 class CreateTournamentService
 {
-    public function create(PlayerCount $playerCount): Tournament
+    public function create(PlayerCount $playerCount, bool $publish): Tournament
     {
         $r = new Rules($playerCount);
         $t = new Tournament($r);
+
+        if ($publish) {
+            $t->publish();
+        }
 
         return $t;
     }

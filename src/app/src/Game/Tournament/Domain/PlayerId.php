@@ -15,6 +15,11 @@ class PlayerId
         $this->id = $id;
     }
 
+    public static function fromString(string $value): self
+    {
+        return new self(new Uuid($value));
+    }
+
     public static function create(): self
     {
         return new self(Uuid::random());

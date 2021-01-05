@@ -4,6 +4,8 @@
 namespace App\Tests\Integration\Game\Tournament;
 
 
+use App\Game\Tournament\Domain\Player;
+use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class CreateTournamentTest extends KernelTestCase
@@ -22,6 +24,12 @@ class CreateTournamentTest extends KernelTestCase
     /** @test */
     public function create(): void
     {
+//        $player = new Player();
+//        $this->entityManager->persist($player);
+//        $this->entityManager->flush();
+        $repo   = $this->entityManager->getRepository(Player::class);
+        $player = $repo->find('93383c90-13de-4caf-b138-16e754acb8da');
+        dump($player);
         // Given
 
         // When

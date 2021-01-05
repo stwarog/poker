@@ -19,10 +19,11 @@ final class TournamentFacade
         $this->createTournamentService = $createTournamentService;
     }
 
-    public function create(int $minPlayerCount, int $maxPlayerCount): Tournament
+    public function create(int $minPlayerCount, int $maxPlayerCount, bool $publish = false): Tournament
     {
         return $this->createTournamentService->create(
-            new PlayerCount($minPlayerCount, $maxPlayerCount)
+            new PlayerCount($minPlayerCount, $maxPlayerCount),
+            $publish
         );
     }
 }
