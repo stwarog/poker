@@ -10,7 +10,7 @@ class Player
 
     public function __construct(?PlayerId $uuid = null)
     {
-        $this->uuid = (string) $uuid ?? (string) PlayerId::create();
+        $this->uuid = $uuid ? (string) $uuid : (string) PlayerId::create();
     }
 
     public function getId(): PlayerId

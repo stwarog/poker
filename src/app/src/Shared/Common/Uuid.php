@@ -28,7 +28,7 @@ final class Uuid
 
     public static function from(string $uuid): self
     {
-        new self($uuid);
+        return new self($uuid);
     }
 
     public function __toString(): string
