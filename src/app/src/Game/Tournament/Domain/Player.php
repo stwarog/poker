@@ -2,19 +2,16 @@
 
 namespace App\Game\Tournament\Domain;
 
-use Symfony\Component\Uid\Uuid;
-
 class Player
 {
-    /** @var Uuid|null */
-    private ?Uuid $uuid;
+    private ?PlayerId $uuid;
 
-    public function __construct(?Uuid $uuid = null)
+    public function __construct(?PlayerId $uuid = null)
     {
-        $this->uuid = $uuid ?? Uuid::v4();
+        $this->uuid = $uuid ?? PlayerId::create();
     }
 
-    public function getId(): Uuid
+    public function getId(): PlayerId
     {
         return $this->uuid;
     }
