@@ -87,8 +87,8 @@ class TournamentTest extends TestCase
     public function signUp__has_participants__joins(): void
     {
         // Given
-        $participant1       = new Player();
-        $participant2       = new Player();
+        $participant1  = new Player();
+        $participant2  = new Player();
         $expectedCount = 2;
 
         // When
@@ -109,9 +109,9 @@ class TournamentTest extends TestCase
         $this->expectExceptionMessage('Tournament has already full amount of participants');
 
         // Given
-        $participant1       = new Player();
-        $participant2       = new Player();
-        $participant3       = new Player();
+        $participant1  = new Player();
+        $participant2  = new Player();
+        $participant3  = new Player();
         $expectedCount = 2;
 
         // When

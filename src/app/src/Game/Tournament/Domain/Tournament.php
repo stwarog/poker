@@ -3,6 +3,8 @@
 namespace App\Game\Tournament\Domain;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
@@ -12,10 +14,10 @@ class Tournament
     private string $id;
     private string $status;
 
-    /** @var Player[] */
-    private array $participants = []; # signed up
-    /** @var Player[] */
-    private array $players = []; # joined to game
+    /** @var Player[]|Collection */
+    private Collection $participants; # signed up
+    /** @var Player[]|Collection */
+    private Collection $players; # joined to game
 
     private Rules $rules;
 
@@ -23,9 +25,11 @@ class Tournament
         ?TournamentId $id = null,
         ?Rules $rules = null
     ) {
-        $this->id     = $id ? (string) $id : (string) TournamentId::create();
-        $this->status = TournamentStatus::PREPARATION;
-        $this->rules  = $rules ?? Rules::createDefaults();
+        $this->id           = $id ? (string) $id : (string) TournamentId::create();
+        $this->status       = TournamentStatus::PREPARATION;
+        $this->rules        = $rules ?? Rules::createDefaults();
+        $this->participants = new ArrayCollection();
+        $this->players      = new ArrayCollection();
     }
 
     public static function create(?Rules $rules = null): self

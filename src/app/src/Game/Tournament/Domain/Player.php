@@ -2,19 +2,17 @@
 
 namespace App\Game\Tournament\Domain;
 
-use App\Shared\Common\Uuid;
-
 class Player
 {
-    private string $uuid;
+    private string $id;
 
     public function __construct(?PlayerId $uuid = null)
     {
-        $this->uuid = $uuid ? (string) $uuid : (string) PlayerId::create();
+        $this->id = $uuid ? (string) $uuid : (string) PlayerId::create();
     }
 
     public function getId(): PlayerId
     {
-        return new PlayerId(Uuid::from($this->uuid));
+        return PlayerId::fromString($this->id);
     }
 }

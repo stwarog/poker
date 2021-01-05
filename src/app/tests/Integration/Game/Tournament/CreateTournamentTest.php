@@ -4,37 +4,27 @@
 namespace App\Tests\Integration\Game\Tournament;
 
 
-use App\Game\Tournament\Domain\Player;
-use Doctrine\ORM\EntityManager;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use App\Game\Tournament\Application\TournamentFacade;
+use App\Tests\Integration\IntegrationTest;
 
-class CreateTournamentTest extends KernelTestCase
+class CreateTournamentTest extends IntegrationTest
 {
-    private EntityManager $entityManager;
-
-    protected function setUp(): void
-    {
-        $kernel = self::bootKernel();
-
-        $this->entityManager = $kernel->getContainer()
-            ->get('doctrine')
-            ->getManager();
-    }
+    private TournamentFacade $facade;
 
     /** @test */
     public function create(): void
     {
-//        $player = new Player();
-//        $this->entityManager->persist($player);
-//        $this->entityManager->flush();
-        $repo   = $this->entityManager->getRepository(Player::class);
-        $player = $repo->find('93383c90-13de-4caf-b138-16e754acb8da');
-        dump($player);
-        // Given
-
         // When
+        $this->facade->create(2, 4, true);
 
         // Then
-        $this->assertTrue(true);
+        $q = $this->q()->select('COUNT(*)')->from('tournament');
+        $this->assertGreaterThan(0, $q->execute()->fetchOne());
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->facade = $this->c->get(TournamentFacade::class);
     }
 }
