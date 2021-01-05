@@ -116,7 +116,7 @@ class TournamentTest extends TestCase
 
         // When
         $r = new Rules(new PlayerCount(2, $expectedCount));
-        $t = new Tournament($r);
+        $t = Tournament::create($r);
         $t->publish();
         $t->signUp($participant1);
         $t->signUp($participant2);
@@ -137,7 +137,7 @@ class TournamentTest extends TestCase
 
         // When
         $r = new Rules(new PlayerCount($expectedCount));
-        $t = new Tournament($r);
+        $t = Tournament::create($r);
         $t->signUp($participant1);
         $t->signUp($participant2);
         $t->startTournament();

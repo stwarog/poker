@@ -7,6 +7,7 @@
         <id name="uuid" type="string">
             <generator strategy="NONE"/>
         </id>
+        <field name="status" type="string" length="20" nullable="false" unique="true"/>
     </entity>
 
 </doctrine-mapping>

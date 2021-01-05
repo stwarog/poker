@@ -6,7 +6,7 @@ namespace App\Game\Tournament\Domain;
 
 use App\Shared\Common\AbstractId;
 
-class PlayerId extends AbstractId
+class TournamentId extends AbstractId
 {
 
 }

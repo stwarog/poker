@@ -9,6 +9,7 @@ use RuntimeException;
 
 class Tournament
 {
+    private string $id;
     private string $status;
 
     /** @var Player[] */
@@ -18,10 +19,18 @@ class Tournament
 
     private Rules $rules;
 
-    public function __construct(?Rules $rules = null)
-    {
+    public function __construct(
+        ?TournamentId $id = null,
+        ?Rules $rules = null
+    ) {
+        $this->id     = $id ? (string) $id : (string) TournamentId::create();
         $this->status = TournamentStatus::PREPARATION;
         $this->rules  = $rules ?? Rules::createDefaults();
+    }
+
+    public static function create(?Rules $rules = null): self
+    {
+        return new self(TournamentId::create(), $rules);
     }
 
     /**

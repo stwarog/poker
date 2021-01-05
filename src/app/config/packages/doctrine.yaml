@@ -16,3 +16,9 @@ doctrine:
         dir: '%kernel.project_dir%/src/Game/Tournament/Infrastructure/ORM/Mapping'
         prefix: 'App\Game\Tournament\Domain'
         alias: Game
+      App\Game\Tournament\Domain\Tournament:
+        is_bundle: false
+        type: xml
+        dir: '%kernel.project_dir%/src/Game/Tournament/Infrastructure/ORM/Mapping'
+        prefix: 'App\Game\Tournament\Domain'
+        alias: Game
