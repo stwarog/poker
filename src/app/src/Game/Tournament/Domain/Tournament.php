@@ -9,7 +9,7 @@ use RuntimeException;
 
 class Tournament
 {
-    private TournamentStatus $status;
+    private string $status;
 
     /** @var Player[] */
     private array $participants = []; # signed up
@@ -20,7 +20,7 @@ class Tournament
 
     public function __construct(?Rules $rules = null)
     {
-        $this->status = TournamentStatus::PREPARATION();
+        $this->status = TournamentStatus::PREPARATION;
         $this->rules  = $rules ?? Rules::createDefaults();
     }
 
@@ -48,7 +48,7 @@ class Tournament
 
     private function isReadyForSignUps(): bool
     {
-        return $this->status->equals(TournamentStatus::SIGN_UPS());
+        return $this->status === TournamentStatus::SIGN_UPS;
     }
 
     public function participantCount(): int
@@ -63,7 +63,7 @@ class Tournament
 
     public function startTournament(): void
     {
-        $this->status = TournamentStatus::STARTED();
+        $this->status = TournamentStatus::STARTED;
     }
 
     /**
@@ -84,7 +84,7 @@ class Tournament
         $this->players[] = $player;
 
         if ($isReadyToStart = $this->getPlayersCount() >= $this->rules->getPlayerCount()->getMin()) {
-            $this->status = TournamentStatus::READY();
+            $this->status = TournamentStatus::READY;
         }
     }
 
@@ -107,7 +107,7 @@ class Tournament
 
     private function isReady(): bool
     {
-        return $this->status->equals(TournamentStatus::READY());
+        return $this->status === TournamentStatus::READY;
     }
 
     public function leave(Player $player): void
@@ -125,11 +125,11 @@ class Tournament
             throw new RuntimeException('Tournament must be in preparation status to get published');
         }
 
-        $this->status = TournamentStatus::SIGN_UPS();
+        $this->status = TournamentStatus::SIGN_UPS;
     }
 
     public function getStatus(): TournamentStatus
     {
-        return $this->status;
+        return new TournamentStatus($this->status);
     }
 }
