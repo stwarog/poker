@@ -91,5 +91,20 @@ class Tournament
         if (false === $this->hasParticipant($player)) {
             throw new RuntimeException('Can not join this tournament because is not signed up');
         }
+
+        if (false === $this->isReady()) {
+            throw new RuntimeException('Tournament is not ready to play');
+        }
+
+        if ($this->hasPlayer($player)) {
+            throw new RuntimeException('Player already joined to this tournament');
+        }
+
+        $this->players[] = $player;
+    }
+
+    private function hasPlayer(Player $player): bool
+    {
+        return !empty(array_filter($this->players, fn(Player $p) => $p->getId()->equals($player->getId())));
     }
 }

@@ -166,4 +166,39 @@ class TournamentTest extends TestCase
         $t = new Tournament();
         $t->join($participant1);
     }
+
+    /** @test */
+    public function join__not_ready__throws_runtime_exception(): void
+    {
+        // Except
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Tournament is not ready to play');
+
+        // Given
+        $participant1 = new Player();
+
+        // When
+        $t = new Tournament();
+        $t->signUp($participant1);
+        $t->join($participant1);
+    }
+
+    /** @test */
+    public function join__already_joined__throws_runtime_exception(): void
+    {
+        // Except
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Player already joined to this tournament');
+
+        // Given
+        $participant1 = new Player();
+        $participant2 = new Player();
+
+        // When
+        $t = new Tournament();
+        $t->signUp($participant1);
+        $t->signUp($participant2);
+        $t->join($participant1);
+        $t->join($participant1);
+    }
 }
