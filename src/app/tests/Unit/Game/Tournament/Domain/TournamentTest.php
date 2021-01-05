@@ -153,7 +153,7 @@ class TournamentTest extends TestCase
     }
 
     /** @test */
-    public function join__not_signed_up__throws_invalid_argument_exception(): void
+    public function join__not_signed_up__throws_runtime_exception(): void
     {
         // Except
         $this->expectException(RuntimeException::class);
