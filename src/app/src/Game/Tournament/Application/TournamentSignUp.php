@@ -7,11 +7,12 @@ use App\Game\Tournament\Domain\PlayerByIdInterface;
 use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\TournamentByIdInterface;
 use App\Game\Tournament\Domain\TournamentId;
+use App\Game\Tournament\Domain\TournamentRepositoryInterface;
 use Exception;
 
 class TournamentSignUp
 {
-    private TournamentByIdInterface $tournamentRepository;
+    private TournamentRepositoryInterface $tournamentRepository;
     private PlayerByIdInterface $playerRepository;
 
     public function __construct(
@@ -34,5 +35,7 @@ class TournamentSignUp
         $player     = $this->playerRepository->getById($playerId);
 
         $tournament->signUp($player);
+
+        $this->tournamentRepository->save($tournament);
     }
 }
