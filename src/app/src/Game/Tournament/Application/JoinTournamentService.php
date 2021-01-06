@@ -32,9 +32,8 @@ class JoinTournamentService
     public function join(TournamentId $tournamentId, PlayerId $playerId): void
     {
         $tournament = $this->tournamentRepository->getById($tournamentId);
-        $player     = $this->playerRepository->getById($playerId);
 
-        $tournament->join($player);
+        $tournament->join($playerId);
 
         $this->tournamentRepository->save($tournament);
     }

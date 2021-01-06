@@ -29,4 +29,11 @@ abstract class IntegrationTest extends KernelTestCase
     {
         return $this->connection->createQueryBuilder();
     }
+
+    protected function getDbCount(string $table): int
+    {
+        $q = $this->q()->select('COUNT(*)')->from($table);
+
+        return (int) $q->execute()->fetchOne();
+    }
 }

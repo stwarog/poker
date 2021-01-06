@@ -4,11 +4,8 @@
 namespace App\Game\Tournament\Application;
 
 
-use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerCount;
 use App\Game\Tournament\Domain\PlayerId;
-use App\Game\Tournament\Domain\PlayerRepositoryInterface;
-use App\Game\Tournament\Domain\Tournament;
 use App\Game\Tournament\Domain\TournamentId;
 use Exception;
 
@@ -19,41 +16,41 @@ final class TournamentFacade
 {
     private CreateTournamentService $createTournamentService;
     private TournamentSignUp $tournamentSignUpService;
-    private PlayerRepositoryInterface $playerRepository;
     private JoinTournamentService $joinTournamentService;
 
     public function __construct(
         CreateTournamentService $createTournamentService,
-        PlayerRepositoryInterface $playerRepository,
         JoinTournamentService $joinTournamentService,
         TournamentSignUp $tournamentSignUpService
     ) {
         $this->createTournamentService = $createTournamentService;
         $this->tournamentSignUpService = $tournamentSignUpService;
-        $this->playerRepository        = $playerRepository;
         $this->joinTournamentService   = $joinTournamentService;
     }
 
-    public function create(int $minPlayerCount, int $maxPlayerCount, bool $publish = false): Tournament
+    public function create(int $minPlayerCount, int $maxPlayerCount, bool $publish = false): string
     {
-        return $this->createTournamentService->create(
+        $t = $this->createTournamentService->create(
             new PlayerCount($minPlayerCount, $maxPlayerCount),
             $publish
         );
+
+        return $t->toString();
     }
 
     /**
      * @param string $tournamentId
-     * @param string $playerId
      *
+     * @return string
      * @throws Exception
      */
-    public function signUp(string $tournamentId, string $playerId): void
+    public function signUp(string $tournamentId): string
     {
-        $this->tournamentSignUpService->signUp(
-            TournamentId::fromString($tournamentId),
-            PlayerId::fromString($playerId),
+        $player = $this->tournamentSignUpService->signUp(
+            TournamentId::fromString($tournamentId)
         );
+
+        return $player->toString();
     }
 
     /**
@@ -68,13 +65,5 @@ final class TournamentFacade
             TournamentId::fromString($tournamentId),
             PlayerId::fromString($playerId),
         );
-    }
-
-    public function createPlayer(): Player
-    {
-        $p = new Player();
-        $this->playerRepository->save($p);
-
-        return $p;
     }
 }

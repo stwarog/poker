@@ -25,17 +25,18 @@ class TournamentSignUp
 
     /**
      * @param TournamentId $tournamentId
-     * @param PlayerId     $playerId
      *
+     * @return PlayerId
      * @throws Exception
      */
-    public function signUp(TournamentId $tournamentId, PlayerId $playerId): void
+    public function signUp(TournamentId $tournamentId): PlayerId
     {
         $tournament = $this->tournamentRepository->getById($tournamentId);
-        $player     = $this->playerRepository->getById($playerId);
 
-        $tournament->signUp($player);
+        $player = $tournament->signUp();
 
         $this->tournamentRepository->save($tournament);
+
+        return $player;
     }
 }

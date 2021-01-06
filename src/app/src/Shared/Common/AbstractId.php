@@ -40,6 +40,11 @@ abstract class AbstractId
 
     public function __toString()
     {
+        return $this->toString();
+    }
+
+    public function toString(): string
+    {
         return (string) $this->id;
     }
 }

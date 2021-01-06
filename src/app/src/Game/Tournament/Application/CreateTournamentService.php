@@ -7,6 +7,7 @@ namespace App\Game\Tournament\Application;
 use App\Game\Tournament\Domain\PlayerCount;
 use App\Game\Tournament\Domain\Rules;
 use App\Game\Tournament\Domain\Tournament;
+use App\Game\Tournament\Domain\TournamentId;
 use App\Game\Tournament\Domain\TournamentRepositoryInterface;
 
 class CreateTournamentService
@@ -18,7 +19,7 @@ class CreateTournamentService
         $this->repository = $repository;
     }
 
-    public function create(PlayerCount $playerCount, bool $publish): Tournament
+    public function create(PlayerCount $playerCount, bool $publish): TournamentId
     {
         $r = new Rules($playerCount);
         $t = Tournament::create($r);
@@ -29,6 +30,6 @@ class CreateTournamentService
 
         $this->repository->save($t);
 
-        return $t;
+        return $t->getId();
     }
 }

@@ -43,11 +43,10 @@ class Tournament
     }
 
     /**
-     * @param Player $player
-     *
+     * @return PlayerId
      * @throws Exception
      */
-    public function signUp(Player $player): void
+    public function signUp(): PlayerId
     {
         if (false === $this->isReadyForSignUps()) {
             throw new Exception('Tournament sign up is closed');
@@ -57,11 +56,10 @@ class Tournament
             throw new InvalidArgumentException(sprintf('Tournament has already full amount of participants'));
         }
 
-        if ($this->hasParticipant($player)) {
-            throw new RuntimeException('Participant already registered to this tournament');
-        }
+        $p = new Player();
+        $this->participants->set($p->getId()->toString(), $p);
 
-        $this->participants->add($player);
+        return $p->getId();
     }
 
     private function isReadyForSignUps(): bool
@@ -74,9 +72,9 @@ class Tournament
         return $this->participants->count();
     }
 
-    private function hasParticipant(Player $player): bool
+    public function hasParticipant(PlayerId $participant): bool
     {
-        return $this->participants->contains($player);
+        return $this->participants->containsKey($participant->toString());
     }
 
     public function startTournament(): void
@@ -85,11 +83,11 @@ class Tournament
     }
 
     /**
-     * @param Player $player
+     * @param PlayerId $player
      *
      * @throws RuntimeException
      */
-    public function join(Player $player): void
+    public function join(PlayerId $player): void
     {
         if (false === $this->hasParticipant($player)) {
             throw new RuntimeException('Can not join this tournament because is not signed up');
@@ -99,19 +97,20 @@ class Tournament
             throw new RuntimeException('Player already joined to this tournament');
         }
 
-        $this->players->add($player);
+        $p = $this->participants->get($player->toString());
+        $this->players->set($p->getId()->toString(), $p);
 
         if ($isReadyToStart = $this->getPlayersCount() >= $this->rules->getPlayerCount()->getMin()) {
             $this->status = TournamentStatus::READY;
         }
     }
 
-    public function hasPlayer(Player $player): bool
+    public function hasPlayer(PlayerId $player): bool
     {
-        return $this->players->contains($player);
+        return $this->players->containsKey($player->toString());
     }
 
-    private function getPlayersCount(): int
+    public function getPlayersCount(): int
     {
         return $this->players->count();
     }
@@ -128,13 +127,13 @@ class Tournament
         return $this->status === TournamentStatus::READY;
     }
 
-    public function leave(Player $player): void
+    public function leave(PlayerId $player): void
     {
         if (false === $this->hasPlayer($player)) {
             throw new InvalidArgumentException('Player is already out of this tournament');
         }
 
-        $this->players->removeElement($player);
+        $this->players->remove($player->toString());
     }
 
     public function publish(): void
