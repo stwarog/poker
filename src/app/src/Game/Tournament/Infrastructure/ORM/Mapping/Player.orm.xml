@@ -4,9 +4,23 @@
                    https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
     <entity name="App\Game\Tournament\Domain\Player" table="player">
-        <id name="id" type="string">
+
+        <id name="id" type="string" length="80">
             <generator strategy="NONE"/>
         </id>
+
+        <field name="status" length="6">
+            <options>
+                <option name="default">active</option>
+            </options>
+        </field>
+
+        <field name="chips" type="smallint">
+            <options>
+                <option name="default">0</option>
+            </options>
+        </field>
+
     </entity>
 
 </doctrine-mapping>

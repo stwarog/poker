@@ -8,8 +8,8 @@ use Webmozart\Assert\Assert;
 class Player
 {
     private string $id;
-    private int $chips = 0;
     private string $status = PlayerStatus::ACTIVE;
+    private int $chips = 0;
 
     public function __construct(?PlayerId $uuid = null)
     {

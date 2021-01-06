@@ -5,18 +5,41 @@
 
     <entity name="App\Game\Tournament\Domain\Tournament" table="tournament">
 
-        <id name="id" type="string">
+        <id name="id" type="string" length="80">
             <generator strategy="NONE"/>
         </id>
 
         <field name="status" length="20"/>
 
-        <field name="minPlayerCount" type="smallint"/>
-        <field name="maxPlayerCount" type="smallint"/>
+        <field name="minPlayerCount" type="smallint">
+            <options>
+                <option name="default">2</option>
+            </options>
+        </field>
 
-        <field name="initialChipsPerPlayer" type="smallint"/>
-        <field name="initialSmallBlind" type="smallint"/>
-        <field name="initialBigBlind" type="smallint"/>
+        <field name="maxPlayerCount" type="smallint">
+            <options>
+                <option name="default">12</option>
+            </options>
+        </field>
+
+        <field name="initialChipsPerPlayer" type="smallint">
+            <options>
+                <option name="default">2000</option>
+            </options>
+        </field>
+
+        <field name="initialSmallBlind" type="smallint">
+            <options>
+                <option name="default">25</option>
+            </options>
+        </field>
+
+        <field name="initialBigBlind" type="smallint">
+            <options>
+                <option name="default">50</option>
+            </options>
+        </field>
 
         <many-to-many field="players" target-entity="Player">
             <cascade>
