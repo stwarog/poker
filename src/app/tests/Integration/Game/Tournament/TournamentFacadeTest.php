@@ -16,7 +16,7 @@ class TournamentFacadeTest extends IntegrationTest
     {
         // Given
         $exceptedCount = 1;
-        $tournament    = $this->facade->create(2, 4, true);
+        $tournament    = $this->facade->create(2, 4, 4000, 25, 50, true);
 
         // When
         $this->facade->signUp($tournament);
@@ -30,7 +30,7 @@ class TournamentFacadeTest extends IntegrationTest
     {
         // Given
         $exceptedCount = 2;
-        $tournament    = $this->facade->create(2, 4, true);
+        $tournament    = $this->facade->create(2, 4, 4000, 25, 50, true);
 
         // When
         $player1 = $this->facade->signUp($tournament);

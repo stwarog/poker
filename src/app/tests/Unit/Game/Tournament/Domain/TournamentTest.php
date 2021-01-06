@@ -175,14 +175,17 @@ class TournamentTest extends TestCase
      * 1
      * @test
      */
-    public function join__tournament(): void
+    public function join__tournament__player_receives_rule_initial_chip_amount(): void
     {
         // Given
+        $r = Rules::createDefaults();
+
         $expected             = true;
         $expectedPlayerCounts = 2;
+        $expectedChipAmount   = $r->getInitialChipsPerPlayer();
 
         // When
-        $t = new Tournament();
+        $t = Tournament::create($r);
         $t->publish();
         $p1 = $t->signUp();
         $p2 = $t->signUp();
@@ -193,6 +196,8 @@ class TournamentTest extends TestCase
         $this->assertSame($expected, $t->hasPlayer($p1));
         $this->assertSame($expected, $t->hasPlayer($p2));
         $this->assertSame($expectedPlayerCounts, $t->getPlayersCount());
+        $this->assertTrue($expectedChipAmount->equals($t->getPlayerChips($p1)));
+        $this->assertTrue($expectedChipAmount->equals($t->getPlayerChips($p2)));
     }
 
     /** @test */

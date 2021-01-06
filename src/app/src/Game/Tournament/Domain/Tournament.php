@@ -3,6 +3,7 @@
 namespace App\Game\Tournament\Domain;
 
 
+use App\Game\Chip;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Exception;
@@ -57,6 +58,7 @@ class Tournament
         }
 
         $p = new Player();
+        $p->addChips($this->getRules()->getInitialChipsPerPlayer());
         $this->participants->set($p->getId()->toString(), $p);
 
         return $p->getId();
@@ -148,5 +150,15 @@ class Tournament
     public function getStatus(): TournamentStatus
     {
         return new TournamentStatus($this->status);
+    }
+
+    private function getRules(): Rules
+    {
+        return $this->rules;
+    }
+
+    public function getPlayerChips(PlayerId $p): Chip
+    {
+        return $this->players->get($p->toString())->chipsAmount();
     }
 }

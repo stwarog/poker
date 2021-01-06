@@ -40,7 +40,7 @@ class Rules
         return $this->playerCount;
     }
 
-    public function getChipsPerPlayer(): Chip
+    public function getInitialChipsPerPlayer(): Chip
     {
         return $this->chipsPerPlayer;
     }

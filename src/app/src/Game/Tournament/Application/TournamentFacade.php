@@ -4,6 +4,7 @@
 namespace App\Game\Tournament\Application;
 
 
+use App\Game\Chip;
 use App\Game\Tournament\Domain\PlayerCount;
 use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\TournamentId;
@@ -28,10 +29,19 @@ final class TournamentFacade
         $this->joinTournamentService   = $joinTournamentService;
     }
 
-    public function create(int $minPlayerCount, int $maxPlayerCount, bool $publish = false): string
-    {
+    public function create(
+        int $minPlayerCount,
+        int $maxPlayerCount,
+        int $initialChipsPerPlayer,
+        int $initialSmallBlind,
+        int $initialBigBlind,
+        bool $publish = false
+    ): string {
         $t = $this->createTournamentService->create(
             new PlayerCount($minPlayerCount, $maxPlayerCount),
+            new Chip($initialChipsPerPlayer),
+            new Chip($initialSmallBlind),
+            new Chip($initialBigBlind),
             $publish
         );
 
