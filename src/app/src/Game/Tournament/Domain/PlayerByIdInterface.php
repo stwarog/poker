@@ -8,10 +8,10 @@ use App\Shared\Exception\NotFoundException;
 interface PlayerByIdInterface
 {
     /**
-     * @param string $playerId
+     * @param PlayerId $playerId
      *
      * @return Player
      * @throws NotFoundException
      */
-    public function getById(string $playerId): Player;
+    public function getById(PlayerId $playerId): Player;
 }

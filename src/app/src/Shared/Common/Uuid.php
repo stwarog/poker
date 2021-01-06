@@ -26,6 +26,11 @@ final class Uuid
         return new self(RamseyUuid::uuid4()->toString());
     }
 
+    public static function from(string $uuid): self
+    {
+        return new self($uuid);
+    }
+
     public function __toString(): string
     {
         return $this->value;

@@ -4,8 +4,9 @@
 namespace App\Tests\Unit\Game\Tournament\Domain;
 
 
-use App\Game\Tournament\Domain\Player;
+use App\Game\Chip;
 use App\Game\Tournament\Domain\PlayerCount;
+use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Rules;
 use App\Game\Tournament\Domain\Tournament;
 use App\Game\Tournament\Domain\TournamentStatus;
@@ -65,40 +66,42 @@ class TournamentTest extends TestCase
      * 1
      * @test
      */
-    public function signUp__no_participants__joins(): void
+    public function signUp__no_participants__returns_participant(): void
     {
         // Given
-        $participant   = new Player();
-        $expectedCount = 1;
+        $expectedCount          = 1;
+        $expectedHasParticipant = true;
 
         // When
         $t = new Tournament();
         $t->publish();
-        $t->signUp($participant);
+        $p = $t->signUp();
 
         // Then
         $this->assertSame($expectedCount, $t->participantCount());
+        $this->assertSame($expectedHasParticipant, $t->hasParticipant($p));
     }
 
     /**
      * N
      * @test
      */
-    public function signUp__has_participants__joins(): void
+    public function signUp__has_participants__ok(): void
     {
         // Given
-        $participant1       = new Player();
-        $participant2       = new Player();
-        $expectedCount = 2;
+        $expectedCount          = 2;
+        $expectedHasParticipant = true;
 
         // When
         $t = new Tournament();
         $t->publish();
-        $t->signUp($participant1);
-        $t->signUp($participant2);
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
 
         // Then
         $this->assertSame($expectedCount, $t->participantCount());
+        $this->assertSame($expectedHasParticipant, $t->hasParticipant($p1));
+        $this->assertSame($expectedHasParticipant, $t->hasParticipant($p1));
     }
 
     /** @test */
@@ -109,18 +112,15 @@ class TournamentTest extends TestCase
         $this->expectExceptionMessage('Tournament has already full amount of participants');
 
         // Given
-        $participant1       = new Player();
-        $participant2       = new Player();
-        $participant3       = new Player();
         $expectedCount = 2;
 
         // When
-        $r = new Rules(new PlayerCount(2, $expectedCount));
-        $t = new Tournament($r);
+        $r = new Rules(new PlayerCount(2, $expectedCount), Chip::create(4000), Chip::create(25), Chip::create(50));
+        $t = Tournament::create($r);
         $t->publish();
-        $t->signUp($participant1);
-        $t->signUp($participant2);
-        $t->signUp($participant3);
+        $t->signUp();
+        $t->signUp();
+        $t->signUp();
     }
 
     /** @test */
@@ -131,34 +131,15 @@ class TournamentTest extends TestCase
         $this->expectExceptionMessage('Tournament sign up is closed');
 
         // Given
-        $participant1  = new Player();
-        $participant2  = new Player();
         $expectedCount = 2;
 
         // When
-        $r = new Rules(new PlayerCount($expectedCount));
-        $t = new Tournament($r);
-        $t->signUp($participant1);
-        $t->signUp($participant2);
+        $r = Rules::createDefaults();
+        $t = Tournament::create($r);
+        $t->signUp();
+        $t->signUp();
         $t->startTournament();
-        $t->signUp($participant2);
-    }
-
-    /** @test */
-    public function signUp__already_joined__throws_runtime_exception(): void
-    {
-        // Except
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Participant already registered to this tournament');
-
-        // Given
-        $participant1 = new Player();
-
-        // When
-        $t = new Tournament();
-        $t->publish();
-        $t->signUp($participant1);
-        $t->signUp($participant1);
+        $t->signUp();
     }
 
     /** @test */
@@ -168,13 +149,10 @@ class TournamentTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Can not join this tournament because is not signed up');
 
-        // Given
-        $participant1 = new Player();
-
         // When
         $t = new Tournament();
         $t->publish();
-        $t->join($participant1);
+        $t->join(PlayerId::create());
     }
 
     /** @test */
@@ -184,57 +162,57 @@ class TournamentTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Player already joined to this tournament');
 
-        // Given
-        $participant1 = new Player();
-        $participant2 = new Player();
-
         // When
         $t = new Tournament();
         $t->publish();
-        $t->signUp($participant1);
-        $t->signUp($participant2);
-        $t->join($participant1);
-        $t->join($participant1);
+        $p1 = $t->signUp();
+        $t->signUp();
+        $t->join($p1);
+        $t->join($p1);
     }
 
     /**
      * 1
      * @test
      */
-    public function join__tournament(): void
+    public function join__player_receives_rule_initial_chip_amount(): void
     {
         // Given
-        $participant1 = new Player();
-        $participant2 = new Player();
-        $expected     = true;
+        $r = Rules::createDefaults();
+
+        $expected             = true;
+        $expectedPlayerCounts = 2;
+        $expectedChipAmount   = $r->getInitialChipsPerPlayer();
 
         // When
-        $t = new Tournament();
+        $t = Tournament::create($r);
         $t->publish();
-        $t->signUp($participant1);
-        $t->signUp($participant2);
-        $t->join($participant1);
-        $t->join($participant2);
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
 
         // Then
-        $this->assertSame($expected, $t->hasPlayer($participant1));
+        $this->assertSame($expected, $t->hasPlayer($p1));
+        $this->assertSame($expected, $t->hasPlayer($p2));
+        $this->assertSame($expectedPlayerCounts, $t->getPlayersCount());
+        $this->assertTrue($expectedChipAmount->equals($t->getPlayerChips($p1)));
+        $this->assertTrue($expectedChipAmount->equals($t->getPlayerChips($p2)));
     }
 
     /** @test */
     public function join__minimal_players_count__changes_status_to_ready_to_start(): void
     {
         // Given
-        $participant1 = new Player();
-        $participant2 = new Player();
-        $expected     = TournamentStatus::READY();
+        $expected = TournamentStatus::READY();
 
         // When
         $t = new Tournament();
         $t->publish();
-        $t->signUp($participant1);
-        $t->signUp($participant2);
-        $t->join($participant1);
-        $t->join($participant2);
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
 
         // Then
         $this->assertTrue($expected->equals($t->getStatus()));
@@ -247,21 +225,19 @@ class TournamentTest extends TestCase
     public function leave__tournament(): void
     {
         // Given
-        $participant1 = new Player();
-        $participant2 = new Player();
-        $expected     = false;
+        $expected = false;
 
         // When
         $t = new Tournament();
         $t->publish();
-        $t->signUp($participant1);
-        $t->signUp($participant2);
-        $t->join($participant1);
-        $t->join($participant2);
-        $t->leave($participant1);
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
+        $t->leave($p1);
 
         // Then
-        $this->assertSame($expected, $t->hasPlayer($participant1));
+        $this->assertSame($expected, $t->hasPlayer($p1));
     }
 
     /** @test */
@@ -271,19 +247,15 @@ class TournamentTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Player is already out of this tournament');
 
-        // Given
-        $participant1 = new Player();
-        $participant2 = new Player();
-
         // When
         $t = new Tournament();
         $t->publish();
-        $t->signUp($participant1);
-        $t->signUp($participant2);
-        $t->join($participant1);
-        $t->join($participant2);
-        $t->leave($participant1);
-        $t->leave($participant1);
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
+        $t->leave($p1);
+        $t->leave($p1);
     }
 
 
@@ -294,15 +266,11 @@ class TournamentTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Tournament is not ready to start');
 
-        // Given
-        $participant1 = new Player();
-        $participant2 = new Player();
-
         // When
         $t = new Tournament();
         $t->publish();
-        $t->signUp($participant1);
-        $t->join($participant1);
+        $p = $t->signUp();
+        $t->join($p);
         $t->start();
     }
 }

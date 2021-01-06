@@ -8,10 +8,10 @@ use App\Shared\Exception\NotFoundException;
 interface TournamentByIdInterface
 {
     /**
-     * @param string $tournamentId
+     * @param TournamentId $tournamentId
      *
      * @return Tournament
      * @throws NotFoundException
      */
-    public function getById(string $tournamentId): Tournament;
+    public function getById(TournamentId $tournamentId): Tournament;
 }

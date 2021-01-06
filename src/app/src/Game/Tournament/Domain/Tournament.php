@@ -3,75 +3,113 @@
 namespace App\Game\Tournament\Domain;
 
 
+use App\Game\Chip;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 
 class Tournament
 {
-    private TournamentStatus $status;
+    private string $id;
+    private string $status;
 
-    /** @var Player[] */
-    private array $participants = []; # signed up
-    /** @var Player[] */
-    private array $players = []; # joined to game
+    # player count
+    private int $minPlayerCount;
+    private int $maxPlayerCount;
 
-    private Rules $rules;
+    # chips
+    private int $initialChipsPerPlayer;
+    private int $initialSmallBlind;
+    private int $initialBigBlind;
 
-    public function __construct(?Rules $rules = null)
+    /** @var Player[]|Collection */
+    private Collection $participants; # signed up
+    /** @var Player[]|Collection */
+    private Collection $players; # joined to game
+
+    public function __construct(
+        ?TournamentId $id = null,
+        ?Rules $rules = null
+    ) {
+        $this->id     = $id ? (string) $id : (string) TournamentId::create();
+        $this->status = TournamentStatus::PREPARATION;
+
+        $this->participants = new ArrayCollection();
+        $this->players      = new ArrayCollection();
+
+        $rules                = $rules ?? Rules::createDefaults();
+        $this->minPlayerCount = $rules->getPlayerCount()->getMin();
+        $this->maxPlayerCount = $rules->getPlayerCount()->getMax();
+
+        $this->initialChipsPerPlayer = $rules->getInitialChipsPerPlayer()->getValue();
+        $this->initialSmallBlind     = $rules->getInitialSmallBlind()->getValue();
+        $this->initialBigBlind       = $rules->getInitialBigBlind()->getValue();
+    }
+
+    public static function create(?Rules $rules = null): self
     {
-        $this->status = TournamentStatus::PREPARATION();
-        $this->rules  = $rules ?? Rules::createDefaults();
+        return new self(TournamentId::create(), $rules);
+    }
+
+    public function getId(): TournamentId
+    {
+        return TournamentId::fromString($this->id);
     }
 
     /**
-     * @param Player $player
-     *
+     * @return PlayerId
      * @throws Exception
      */
-    public function signUp(Player $player): void
+    public function signUp(): PlayerId
     {
         if (false === $this->isReadyForSignUps()) {
             throw new Exception('Tournament sign up is closed');
         }
 
-        if ($hasMaxPlayersCount = $this->participantCount() === $this->rules->getPlayerCount()->getMax()) {
+        if ($hasMaxPlayersCount = $this->participantCount() === $this->getRules()->getPlayerCount()->getMax()) {
             throw new InvalidArgumentException(sprintf('Tournament has already full amount of participants'));
         }
 
-        if ($this->hasParticipant($player)) {
-            throw new RuntimeException('Participant already registered to this tournament');
-        }
+        $p = new Player();
+        $p->addChips($this->getRules()->getInitialChipsPerPlayer());
+        $this->participants->set($p->getId()->toString(), $p);
 
-        $this->participants[] = $player;
+        return $p->getId();
     }
 
     private function isReadyForSignUps(): bool
     {
-        return $this->status->equals(TournamentStatus::SIGN_UPS());
+        return $this->status === TournamentStatus::SIGN_UPS;
     }
 
     public function participantCount(): int
     {
-        return count($this->participants);
+        return $this->participants->count();
     }
 
-    private function hasParticipant(Player $player): bool
+    private function getRules(): Rules
     {
-        return !empty(array_filter($this->participants, fn(Player $p) => $p->getId()->equals($player->getId())));
+        return new Rules(
+            new PlayerCount($this->minPlayerCount, $this->maxPlayerCount),
+            new Chip($this->initialChipsPerPlayer),
+            new Chip($this->initialSmallBlind),
+            new Chip($this->initialBigBlind),
+        );
     }
 
     public function startTournament(): void
     {
-        $this->status = TournamentStatus::STARTED();
+        $this->status = TournamentStatus::STARTED;
     }
 
     /**
-     * @param Player $player
+     * @param PlayerId $player
      *
      * @throws RuntimeException
      */
-    public function join(Player $player): void
+    public function join(PlayerId $player): void
     {
         if (false === $this->hasParticipant($player)) {
             throw new RuntimeException('Can not join this tournament because is not signed up');
@@ -81,21 +119,27 @@ class Tournament
             throw new RuntimeException('Player already joined to this tournament');
         }
 
-        $this->players[] = $player;
+        $p = $this->participants->get($player->toString());
+        $this->players->set($p->getId()->toString(), $p);
 
-        if ($isReadyToStart = $this->getPlayersCount() >= $this->rules->getPlayerCount()->getMin()) {
-            $this->status = TournamentStatus::READY();
+        if ($isReadyToStart = $this->getPlayersCount() >= $this->getRules()->getPlayerCount()->getMin()) {
+            $this->status = TournamentStatus::READY;
         }
     }
 
-    public function hasPlayer(Player $player): bool
+    public function hasParticipant(PlayerId $participant): bool
     {
-        return !empty(array_filter($this->players, fn(Player $p) => $p->getId()->equals($player->getId())));
+        return $this->participants->containsKey($participant->toString());
     }
 
-    private function getPlayersCount(): int
+    public function hasPlayer(PlayerId $player): bool
     {
-        return count($this->players);
+        return $this->players->containsKey($player->toString());
+    }
+
+    public function getPlayersCount(): int
+    {
+        return $this->players->count();
     }
 
     public function start(): void
@@ -107,16 +151,16 @@ class Tournament
 
     private function isReady(): bool
     {
-        return $this->status->equals(TournamentStatus::READY());
+        return $this->status === TournamentStatus::READY;
     }
 
-    public function leave(Player $player): void
+    public function leave(PlayerId $player): void
     {
         if (false === $this->hasPlayer($player)) {
             throw new InvalidArgumentException('Player is already out of this tournament');
         }
 
-        $this->players = array_filter($this->players, fn(Player $p) => $p->getId()->notEquals($player->getId()));
+        $this->players->remove($player->toString());
     }
 
     public function publish(): void
@@ -125,11 +169,16 @@ class Tournament
             throw new RuntimeException('Tournament must be in preparation status to get published');
         }
 
-        $this->status = TournamentStatus::SIGN_UPS();
+        $this->status = TournamentStatus::SIGN_UPS;
     }
 
     public function getStatus(): TournamentStatus
     {
-        return $this->status;
+        return new TournamentStatus($this->status);
+    }
+
+    public function getPlayerChips(PlayerId $p): Chip
+    {
+        return $this->players->get($p->toString())->chipsAmount();
     }
 }

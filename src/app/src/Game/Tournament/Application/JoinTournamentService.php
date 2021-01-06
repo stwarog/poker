@@ -10,7 +10,7 @@ use App\Game\Tournament\Domain\TournamentId;
 use App\Game\Tournament\Domain\TournamentRepositoryInterface;
 use Exception;
 
-class TournamentSignUp
+class JoinTournamentService
 {
     private TournamentRepositoryInterface $tournamentRepository;
     private PlayerByIdInterface $playerRepository;
@@ -25,18 +25,16 @@ class TournamentSignUp
 
     /**
      * @param TournamentId $tournamentId
+     * @param PlayerId     $playerId
      *
-     * @return PlayerId
      * @throws Exception
      */
-    public function signUp(TournamentId $tournamentId): PlayerId
+    public function join(TournamentId $tournamentId, PlayerId $playerId): void
     {
         $tournament = $this->tournamentRepository->getById($tournamentId);
 
-        $player = $tournament->signUp();
+        $tournament->join($playerId);
 
         $this->tournamentRepository->save($tournament);
-
-        return $player;
     }
 }
