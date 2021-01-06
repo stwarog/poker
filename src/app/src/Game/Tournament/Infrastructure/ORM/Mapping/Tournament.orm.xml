@@ -4,11 +4,19 @@
                    https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
     <entity name="App\Game\Tournament\Domain\Tournament" table="tournament">
+
         <id name="id" type="string">
             <generator strategy="NONE"/>
         </id>
 
-        <field name="status" type="string" length="20" nullable="false"/>
+        <field name="status" length="20"/>
+
+        <field name="minPlayerCount" type="smallint"/>
+        <field name="maxPlayerCount" type="smallint"/>
+
+        <field name="initialChipsPerPlayer" type="smallint"/>
+        <field name="initialSmallBlind" type="smallint"/>
+        <field name="initialBigBlind" type="smallint"/>
 
         <many-to-many field="players" target-entity="Player">
             <cascade>
