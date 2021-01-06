@@ -32,6 +32,11 @@ class Tournament
         $this->players      = new ArrayCollection();
     }
 
+    public function getId(): TournamentId
+    {
+        return TournamentId::fromString($this->id);
+    }
+
     public static function create(?Rules $rules = null): self
     {
         return new self(TournamentId::create(), $rules);
@@ -56,7 +61,7 @@ class Tournament
             throw new RuntimeException('Participant already registered to this tournament');
         }
 
-        $this->participants[] = $player;
+        $this->participants->add($player);
     }
 
     private function isReadyForSignUps(): bool
@@ -66,12 +71,12 @@ class Tournament
 
     public function participantCount(): int
     {
-        return count($this->participants);
+        return $this->participants->count();
     }
 
     private function hasParticipant(Player $player): bool
     {
-        return !empty(array_filter($this->participants, fn(Player $p) => $p->getId()->equals($player->getId())));
+        return $this->participants->contains($player);
     }
 
     public function startTournament(): void
@@ -94,7 +99,7 @@ class Tournament
             throw new RuntimeException('Player already joined to this tournament');
         }
 
-        $this->players[] = $player;
+        $this->players->add($player);
 
         if ($isReadyToStart = $this->getPlayersCount() >= $this->rules->getPlayerCount()->getMin()) {
             $this->status = TournamentStatus::READY;
@@ -103,12 +108,12 @@ class Tournament
 
     public function hasPlayer(Player $player): bool
     {
-        return !empty(array_filter($this->players, fn(Player $p) => $p->getId()->equals($player->getId())));
+        return $this->players->contains($player);
     }
 
     private function getPlayersCount(): int
     {
-        return count($this->players);
+        return $this->players->count();
     }
 
     public function start(): void
@@ -129,7 +134,7 @@ class Tournament
             throw new InvalidArgumentException('Player is already out of this tournament');
         }
 
-        $this->players = array_filter($this->players, fn(Player $p) => $p->getId()->notEquals($player->getId()));
+        $this->players->removeElement($player);
     }
 
     public function publish(): void

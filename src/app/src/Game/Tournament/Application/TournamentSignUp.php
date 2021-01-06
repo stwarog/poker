@@ -4,7 +4,10 @@ namespace App\Game\Tournament\Application;
 
 
 use App\Game\Tournament\Domain\PlayerByIdInterface;
+use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\TournamentByIdInterface;
+use App\Game\Tournament\Domain\TournamentId;
+use Exception;
 
 class TournamentSignUp
 {
@@ -19,7 +22,13 @@ class TournamentSignUp
         $this->playerRepository     = $playerRepository;
     }
 
-    public function signUp(string $tournamentId, string $playerId): void
+    /**
+     * @param TournamentId $tournamentId
+     * @param PlayerId     $playerId
+     *
+     * @throws Exception
+     */
+    public function signUp(TournamentId $tournamentId, PlayerId $playerId): void
     {
         $tournament = $this->tournamentRepository->getById($tournamentId);
         $player     = $this->playerRepository->getById($playerId);

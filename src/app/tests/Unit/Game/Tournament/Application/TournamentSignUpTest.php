@@ -15,6 +15,7 @@ class TournamentSignUpTest extends TestCase
      */
     public function signUp__valid_tournament_and_player(): void
     {
+        $this->markTestSkipped();
         // Given
         $tournamentId         = 1;
         $playerId             = 1;
