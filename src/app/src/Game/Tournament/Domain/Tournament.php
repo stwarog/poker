@@ -15,22 +15,37 @@ class Tournament
     private string $id;
     private string $status;
 
+    # player count
+    private int $minPlayerCount;
+    private int $maxPlayerCount;
+
+    # chips
+    private int $initialChipsPerPlayer;
+    private int $initialSmallBlind;
+    private int $initialBigBlind;
+
     /** @var Player[]|Collection */
     private Collection $participants; # signed up
     /** @var Player[]|Collection */
     private Collection $players; # joined to game
 
-    private Rules $rules;
-
     public function __construct(
         ?TournamentId $id = null,
         ?Rules $rules = null
     ) {
-        $this->id           = $id ? (string) $id : (string) TournamentId::create();
-        $this->status       = TournamentStatus::PREPARATION;
-        $this->rules        = $rules ?? Rules::createDefaults();
+        $this->id     = $id ? (string) $id : (string) TournamentId::create();
+        $this->status = TournamentStatus::PREPARATION;
+
         $this->participants = new ArrayCollection();
         $this->players      = new ArrayCollection();
+
+        $rules                = $rules ?? Rules::createDefaults();
+        $this->minPlayerCount = $rules->getPlayerCount()->getMin();
+        $this->maxPlayerCount = $rules->getPlayerCount()->getMax();
+
+        $this->initialChipsPerPlayer = $rules->getInitialChipsPerPlayer()->getValue();
+        $this->initialSmallBlind     = $rules->getInitialSmallBlind()->getValue();
+        $this->initialBigBlind       = $rules->getInitialBigBlind()->getValue();
     }
 
     public static function create(?Rules $rules = null): self
@@ -53,7 +68,7 @@ class Tournament
             throw new Exception('Tournament sign up is closed');
         }
 
-        if ($hasMaxPlayersCount = $this->participantCount() === $this->rules->getPlayerCount()->getMax()) {
+        if ($hasMaxPlayersCount = $this->participantCount() === $this->getRules()->getPlayerCount()->getMax()) {
             throw new InvalidArgumentException(sprintf('Tournament has already full amount of participants'));
         }
 
@@ -76,7 +91,12 @@ class Tournament
 
     private function getRules(): Rules
     {
-        return $this->rules;
+        return new Rules(
+            new PlayerCount($this->minPlayerCount, $this->maxPlayerCount),
+            new Chip($this->initialChipsPerPlayer),
+            new Chip($this->initialSmallBlind),
+            new Chip($this->initialBigBlind),
+        );
     }
 
     public function startTournament(): void
@@ -102,7 +122,7 @@ class Tournament
         $p = $this->participants->get($player->toString());
         $this->players->set($p->getId()->toString(), $p);
 
-        if ($isReadyToStart = $this->getPlayersCount() >= $this->rules->getPlayerCount()->getMin()) {
+        if ($isReadyToStart = $this->getPlayersCount() >= $this->getRules()->getPlayerCount()->getMin()) {
             $this->status = TournamentStatus::READY;
         }
     }
