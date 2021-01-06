@@ -8,35 +8,24 @@ use Webmozart\Assert\Assert;
 
 class Chip
 {
-    public const RED_25 = 25;
-    public const WHITE_50 = 50;
-    public const GREEN_100 = 100;
-    public const BLUE_500 = 500;
-    public const BLACK_1000 = 1000;
+    private const DIVIDABLE = 5;
+    public const RED25 = 25;
+    public const WHITE50 = 50;
+    public const GREEN100 = 100;
+    public const BLUE500 = 500;
+    public const BLACK1000 = 1000;
 
     private int $value;
 
     public function __construct(int $value)
     {
-        Assert::greaterThanEq($value, self::RED_25, 'Amount must be greater than zero');
-        foreach ($this->toArray() as $allowedValue) {
-            if ($allowedValue > $value) {
-                break;
-            }
-            Assert::eq($value % $allowedValue, 0, sprintf('Amount must be dividable by: %s', implode(', ', $this->toArray())));
-        }
-        $this->value = $value;
-    }
+        Assert::greaterThanEq($value, 0, 'Amount must be greater or equals zero');
 
-    private function toArray(): array
-    {
-        return [
-            self::RED_25,
-            self::WHITE_50,
-            self::GREEN_100,
-            self::BLUE_500,
-            self::BLACK_1000,
-        ];
+        if ($value !== 0) {
+            Assert::eq($value % self::DIVIDABLE, 0, sprintf('Amount must be dividable by: %s', self::DIVIDABLE));
+        }
+
+        $this->value = $value;
     }
 
     public function getValue(): int
@@ -52,5 +41,10 @@ class Chip
     public static function create(int $value): self
     {
         return new self($value);
+    }
+
+    public function equals(Chip $chipsAmount): bool
+    {
+        return $this->value === $chipsAmount->getValue();
     }
 }

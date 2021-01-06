@@ -31,6 +31,7 @@ class ChipTest extends TestCase
     public function chip_new_with_allowed_value_dataProvider(): array
     {
         return [
+            'zero'       => [0],
             'red 25'     => [25],
             'white 50'   => [50],
             'green 100'  => [100],
@@ -44,7 +45,7 @@ class ChipTest extends TestCase
     {
         // Except
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Amount must be greater than zero');
+        $this->expectExceptionMessage('Amount must be greater or equals zero');
 
         // When
         new Chip(-1);
@@ -58,7 +59,7 @@ class ChipTest extends TestCase
     {
         // Except
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Amount must be dividable by: 25, 50, 100, 500, 1000');
+        $this->expectExceptionMessage('Amount must be dividable by: 5');
 
         // When
         new Chip($amount);
