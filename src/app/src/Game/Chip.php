@@ -48,4 +48,9 @@ class Chip
     {
         return (string) $this->value;
     }
+
+    public static function create(int $value): self
+    {
+        return new self($value);
+    }
 }

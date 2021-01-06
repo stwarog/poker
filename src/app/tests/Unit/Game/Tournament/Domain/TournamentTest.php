@@ -4,6 +4,7 @@
 namespace App\Tests\Unit\Game\Tournament\Domain;
 
 
+use App\Game\Chip;
 use App\Game\Tournament\Domain\PlayerCount;
 use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Rules;
@@ -114,7 +115,7 @@ class TournamentTest extends TestCase
         $expectedCount = 2;
 
         // When
-        $r = new Rules(new PlayerCount(2, $expectedCount));
+        $r = new Rules(new PlayerCount(2, $expectedCount), Chip::create(4000), Chip::create(25), Chip::create(50));
         $t = Tournament::create($r);
         $t->publish();
         $t->signUp();
@@ -133,7 +134,7 @@ class TournamentTest extends TestCase
         $expectedCount = 2;
 
         // When
-        $r = new Rules(new PlayerCount($expectedCount));
+        $r = Rules::createDefaults();
         $t = Tournament::create($r);
         $t->signUp();
         $t->signUp();
