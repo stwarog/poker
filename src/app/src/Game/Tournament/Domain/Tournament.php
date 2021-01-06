@@ -33,14 +33,14 @@ class Tournament
         $this->players      = new ArrayCollection();
     }
 
-    public function getId(): TournamentId
-    {
-        return TournamentId::fromString($this->id);
-    }
-
     public static function create(?Rules $rules = null): self
     {
         return new self(TournamentId::create(), $rules);
+    }
+
+    public function getId(): TournamentId
+    {
+        return TournamentId::fromString($this->id);
     }
 
     /**
@@ -74,9 +74,9 @@ class Tournament
         return $this->participants->count();
     }
 
-    public function hasParticipant(PlayerId $participant): bool
+    private function getRules(): Rules
     {
-        return $this->participants->containsKey($participant->toString());
+        return $this->rules;
     }
 
     public function startTournament(): void
@@ -105,6 +105,11 @@ class Tournament
         if ($isReadyToStart = $this->getPlayersCount() >= $this->rules->getPlayerCount()->getMin()) {
             $this->status = TournamentStatus::READY;
         }
+    }
+
+    public function hasParticipant(PlayerId $participant): bool
+    {
+        return $this->participants->containsKey($participant->toString());
     }
 
     public function hasPlayer(PlayerId $player): bool
@@ -150,11 +155,6 @@ class Tournament
     public function getStatus(): TournamentStatus
     {
         return new TournamentStatus($this->status);
-    }
-
-    private function getRules(): Rules
-    {
-        return $this->rules;
     }
 
     public function getPlayerChips(PlayerId $p): Chip

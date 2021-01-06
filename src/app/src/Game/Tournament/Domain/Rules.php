@@ -9,20 +9,20 @@ use App\Game\Chip;
 class Rules
 {
     private PlayerCount $playerCount;
-    private Chip $chipsPerPlayer;
+    private Chip $initialChipsPerPlayer;
     private Chip $initialSmallBlind;
     private Chip $initialBigBlind;
 
     public function __construct(
         PlayerCount $playerCount,
-        Chip $chipsPerPlayer,
+        Chip $initialChipsPerPlayer,
         Chip $initialSmallBlind,
         Chip $initialBigBlind
     ) {
-        $this->playerCount       = $playerCount;
-        $this->chipsPerPlayer    = $chipsPerPlayer;
-        $this->initialSmallBlind = $initialSmallBlind;
-        $this->initialBigBlind   = $initialBigBlind;
+        $this->playerCount           = $playerCount;
+        $this->initialChipsPerPlayer = $initialChipsPerPlayer;
+        $this->initialSmallBlind     = $initialSmallBlind;
+        $this->initialBigBlind       = $initialBigBlind;
     }
 
     public static function createDefaults(): self
@@ -42,7 +42,7 @@ class Rules
 
     public function getInitialChipsPerPlayer(): Chip
     {
-        return $this->chipsPerPlayer;
+        return $this->initialChipsPerPlayer;
     }
 
     public function getInitialSmallBlind(): Chip

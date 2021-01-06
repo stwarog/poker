@@ -47,13 +47,13 @@ class Player
         return new Chip($this->chips);
     }
 
-    public function getStatus(): PlayerStatus
-    {
-        return new PlayerStatus($this->status);
-    }
-
     private function lost()
     {
         $this->status = PlayerStatus::LOST;
+    }
+
+    public function getStatus(): PlayerStatus
+    {
+        return new PlayerStatus($this->status);
     }
 }

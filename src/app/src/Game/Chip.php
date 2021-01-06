@@ -28,9 +28,9 @@ class Chip
         $this->value = $value;
     }
 
-    public function getValue(): int
+    public static function create(int $value): self
     {
-        return $this->value;
+        return new self($value);
     }
 
     public function __toString()
@@ -38,13 +38,13 @@ class Chip
         return (string) $this->value;
     }
 
-    public static function create(int $value): self
-    {
-        return new self($value);
-    }
-
     public function equals(Chip $chipsAmount): bool
     {
         return $this->value === $chipsAmount->getValue();
+    }
+
+    public function getValue(): int
+    {
+        return $this->value;
     }
 }

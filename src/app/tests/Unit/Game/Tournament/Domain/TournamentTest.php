@@ -86,7 +86,7 @@ class TournamentTest extends TestCase
      * N
      * @test
      */
-    public function signUp__has_participants__joins(): void
+    public function signUp__has_participants__ok(): void
     {
         // Given
         $expectedCount          = 2;
@@ -175,7 +175,7 @@ class TournamentTest extends TestCase
      * 1
      * @test
      */
-    public function join__tournament__player_receives_rule_initial_chip_amount(): void
+    public function join__player_receives_rule_initial_chip_amount(): void
     {
         // Given
         $r = Rules::createDefaults();
