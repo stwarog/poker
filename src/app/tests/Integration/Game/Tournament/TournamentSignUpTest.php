@@ -24,7 +24,7 @@ class TournamentSignUpTest extends IntegrationTest
         );
 
         // Then
-        $q = $this->q()->select('COUNT(*)')->from('tournament');
+        $q = $this->q()->select('COUNT(*)')->from('tournament_participants');
         $this->assertGreaterThan(0, $q->execute()->fetchOne());
     }
 

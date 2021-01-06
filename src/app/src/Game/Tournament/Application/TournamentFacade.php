@@ -20,15 +20,18 @@ final class TournamentFacade
     private CreateTournamentService $createTournamentService;
     private TournamentSignUp $tournamentSignUpService;
     private PlayerRepositoryInterface $playerRepository;
+    private JoinTournamentService $joinTournamentService;
 
     public function __construct(
         CreateTournamentService $createTournamentService,
         PlayerRepositoryInterface $playerRepository,
+        JoinTournamentService $joinTournamentService,
         TournamentSignUp $tournamentSignUpService
     ) {
         $this->createTournamentService = $createTournamentService;
         $this->tournamentSignUpService = $tournamentSignUpService;
         $this->playerRepository        = $playerRepository;
+        $this->joinTournamentService   = $joinTournamentService;
     }
 
     public function create(int $minPlayerCount, int $maxPlayerCount, bool $publish = false): Tournament
@@ -48,6 +51,20 @@ final class TournamentFacade
     public function signUp(string $tournamentId, string $playerId): void
     {
         $this->tournamentSignUpService->signUp(
+            TournamentId::fromString($tournamentId),
+            PlayerId::fromString($playerId),
+        );
+    }
+
+    /**
+     * @param string $tournamentId
+     * @param string $playerId
+     *
+     * @throws Exception
+     */
+    public function join(string $tournamentId, string $playerId): void
+    {
+        $this->joinTournamentService->join(
             TournamentId::fromString($tournamentId),
             PlayerId::fromString($playerId),
         );
