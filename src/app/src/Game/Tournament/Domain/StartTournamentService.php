@@ -22,6 +22,9 @@ class StartTournamentService
 
         $players = $tournament->getPlayers();
 
+        $players[0]->giveSmallBlind($tournament);
+        $players[1]->giveBigBlind($tournament);
+
         foreach ($players as $player) {
             $player->pickCards($tournament, 2);
         }

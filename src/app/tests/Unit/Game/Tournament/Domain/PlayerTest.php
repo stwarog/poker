@@ -10,10 +10,12 @@ use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Cards\Color;
 use App\Game\Shared\Domain\Cards\Value;
 use App\Game\Tournament\Domain\Player;
+use App\Game\Tournament\Domain\PlayerRole;
 use App\Game\Tournament\Domain\PlayerStatus;
 use App\Game\Tournament\Domain\Tournament;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class PlayerTest extends TestCase
 {
@@ -22,12 +24,14 @@ class PlayerTest extends TestCase
     {
         // Given
         $expectedChipAmount = new Chip(0);
-
+        $expectedRole       = PlayerRole::NONE();
         // When
         $p = new Player();
 
         // Then
         $this->assertTrue($expectedChipAmount->equals($p->chipsAmount()));
+        $this->assertFalse($p->hasBigBlind());
+        $this->assertFalse($p->hasSmallBlind());
     }
 
     /**
@@ -167,5 +171,61 @@ class PlayerTest extends TestCase
             $this->assertSame($expectedCardsCount, $player->getCards()->count());
         }
         $this->assertSame(0, $t->deck()->count());
+    }
+
+    /** @test */
+    public function giveSmallBlind(): void
+    {
+        // Given
+        $p = new Player();
+
+        // When
+        $p->giveSmallBlind(Tournament::create());
+
+        // Then
+        $this->assertTrue($p->hasSmallBlind());
+    }
+
+    /** @test */
+    public function giveSmallBlind_has_not_none_role_throws_runtime_exception(): void
+    {
+        // Except
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Player can not have any role to give small blind');
+
+        // Given
+        $p = new Player();
+
+        // When
+        $p->giveSmallBlind(Tournament::create());
+        $p->giveSmallBlind(Tournament::create());
+    }
+
+    /** @test */
+    public function giveBigBlind(): void
+    {
+        // Given
+        $p = new Player();
+
+        // When
+        $p->giveBigBlind(Tournament::create());
+
+        // Then
+        $this->assertTrue($p->hasBigBlind());
+    }
+
+    /** @test */
+    public function giveBigBlind_has_not_none_role_throws_runtime_exception(): void
+    {
+        // Except
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Player can not have any role to give big blind');
+
+        // Given
+        $p = new Player();
+
+        // When
+        $p->giveBigBlind(Tournament::create());
+        $p->giveBigBlind(Tournament::create());
     }
 }

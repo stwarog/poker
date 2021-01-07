@@ -19,8 +19,6 @@ class Chip
 
     public function __construct(int $value)
     {
-        Assert::greaterThanEq($value, 0, 'Amount must be greater or equals zero');
-
         if ($value !== 0) {
             Assert::eq($value % self::DIVIDABLE, 0, sprintf('Amount must be dividable by: %s', self::DIVIDABLE));
         }
@@ -46,5 +44,10 @@ class Chip
     public function getValue(): int
     {
         return $this->value;
+    }
+
+    public function take(Chip $chip): Chip
+    {
+        return new Chip($this->value -= $chip->getValue());
     }
 }

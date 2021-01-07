@@ -281,10 +281,20 @@ class TournamentTest extends TestCase
     public function start(): void
     {
         // Given
+        $initialChips      = new Chip(100);
+        $initialSmallBlind = new Chip(5);
+        $initialBigBlind   = new Chip(10);
+
+        $rules          = new Rules(
+            new PlayerCount(2, 5),
+            $initialChips,
+            $initialSmallBlind,
+            $initialBigBlind,
+        );
         $expectedStatus = TournamentStatus::STARTED();
 
         // When
-        $t = new Tournament();
+        $t = Tournament::create($rules);
         $t->publish();
         $p1 = $t->signUp();
         $p2 = $t->signUp();
@@ -294,5 +304,8 @@ class TournamentTest extends TestCase
 
         // Then
         $this->assertEquals($expectedStatus, $t->getStatus());
+        foreach ($t->getPlayers() as $player) {
+            $this->assertTrue($player->chipsAmount()->equals($initialChips));
+        }
     }
 }

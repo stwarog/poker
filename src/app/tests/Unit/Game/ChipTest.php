@@ -40,17 +40,6 @@ class ChipTest extends TestCase
         ];
     }
 
-    /** @test */
-    public function chip__less_than_zero__throws_invalid_argument_exception(): void
-    {
-        // Except
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Amount must be greater or equals zero');
-
-        // When
-        new Chip(-1);
-    }
-
     /**
      * @test
      * @dataProvider chip__value_not_dividable_by_values__dataProvider

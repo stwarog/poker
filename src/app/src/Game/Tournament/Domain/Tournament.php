@@ -214,6 +214,16 @@ class Tournament
      */
     public function getPlayers(): array
     {
-        return $this->players->toArray();
+        return array_values($this->players->toArray());
+    }
+
+    public function currentSmallBlind(): Chip
+    {
+        return new Chip($this->currentSmallBlind);
+    }
+
+    public function currentBigBlind(): Chip
+    {
+        return new Chip($this->currentBigBlind);
     }
 }
