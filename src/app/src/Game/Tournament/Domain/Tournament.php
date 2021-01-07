@@ -24,6 +24,13 @@ class Tournament
     private int $initialSmallBlind;
     private int $initialBigBlind;
 
+    # game
+    private int $round = 0;
+    private string $currentPlayer;
+
+    private int $currentSmallBlind;
+    private int $currentBigBlind;
+
     /** @var Player[]|Collection */
     private Collection $participants; # signed up
     /** @var Player[]|Collection */
@@ -46,6 +53,9 @@ class Tournament
         $this->initialChipsPerPlayer = $rules->getInitialChipsPerPlayer()->getValue();
         $this->initialSmallBlind     = $rules->getInitialSmallBlind()->getValue();
         $this->initialBigBlind       = $rules->getInitialBigBlind()->getValue();
+
+        $this->currentSmallBlind = $this->initialSmallBlind;
+        $this->currentBigBlind   = $this->initialBigBlind;
     }
 
     public static function create(?Rules $rules = null): self
@@ -99,11 +109,6 @@ class Tournament
         );
     }
 
-    public function startTournament(): void
-    {
-        $this->status = TournamentStatus::STARTED;
-    }
-
     /**
      * @param PlayerId $player
      *
@@ -147,6 +152,8 @@ class Tournament
         if (false === $this->isReady()) {
             throw new RuntimeException('Tournament is not ready to start');
         }
+
+        $this->status = TournamentStatus::STARTED;
     }
 
     private function isReady(): bool
@@ -180,5 +187,10 @@ class Tournament
     public function getPlayerChips(PlayerId $p): Chip
     {
         return $this->players->get($p->toString())->chipsAmount();
+    }
+
+    public function isStarted(): bool
+    {
+        return $this->status === TournamentStatus::STARTED;
     }
 }
