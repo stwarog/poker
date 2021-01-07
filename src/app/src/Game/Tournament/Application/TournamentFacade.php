@@ -18,15 +18,18 @@ final class TournamentFacade
     private CreateTournamentService $createTournamentService;
     private TournamentSignUp $tournamentSignUpService;
     private JoinTournamentService $joinTournamentService;
+    private StartTournamentService $startTournamentService;
 
     public function __construct(
         CreateTournamentService $createTournamentService,
         JoinTournamentService $joinTournamentService,
-        TournamentSignUp $tournamentSignUpService
+        TournamentSignUp $tournamentSignUpService,
+        StartTournamentService $startTournamentService
     ) {
         $this->createTournamentService = $createTournamentService;
         $this->tournamentSignUpService = $tournamentSignUpService;
         $this->joinTournamentService   = $joinTournamentService;
+        $this->startTournamentService  = $startTournamentService;
     }
 
     public function create(
@@ -74,6 +77,18 @@ final class TournamentFacade
         $this->joinTournamentService->join(
             TournamentId::fromString($tournamentId),
             PlayerId::fromString($playerId),
+        );
+    }
+
+    /**
+     * @param string $tournamentId
+     *
+     * @throws Exception
+     */
+    public function start(string $tournamentId): void
+    {
+        $this->startTournamentService->start(
+            TournamentId::fromString($tournamentId)
         );
     }
 }

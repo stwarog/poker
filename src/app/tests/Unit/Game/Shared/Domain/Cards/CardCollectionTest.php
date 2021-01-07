@@ -44,7 +44,7 @@ class CardCollectionTest extends TestCase
      * 1
      * @test
      */
-    public function pickCard__has_cards__returns_card_and_removes_from_stock(): void
+    public function pickCard__has_cards__returns_card_and_removes_from_stock_and_resets_keys(): void
     {
         // Given
         $card = new Card(Color::CLUB(), Value::EIGHT());
@@ -58,6 +58,30 @@ class CardCollectionTest extends TestCase
         // Then
         $this->assertTrue($c->isEmpty());
         $this->assertTrue($new->hasCard($card));
+    }
+
+    /**
+     * 1
+     * @test
+     */
+    public function pickCard__has_cards__resets_keys(): void
+    {
+        // Given
+        $card         = new Card(Color::CLUB(), Value::EIGHT());
+        $card         = new Card(Color::CLUB(), Value::EIGHT());
+        $card         = new Card(Color::CLUB(), Value::EIGHT());
+        $expectedKeys = [0, 1];
+
+        // When
+        $c = new CardCollection();
+        $c->addCard($card);
+        $c->addCard($card);
+        $c->addCard($card);
+
+        $c->pickCard();
+
+        // Then
+        $this->assertSame($expectedKeys, $c->getKeys());
     }
 
     /**

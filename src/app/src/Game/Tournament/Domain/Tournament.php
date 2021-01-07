@@ -4,6 +4,7 @@ namespace App\Game\Tournament\Domain;
 
 
 use App\Game\Chip;
+use App\Game\Shared\Domain\Cards\CardCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Exception;
@@ -25,8 +26,8 @@ class Tournament
     private int $initialBigBlind;
 
     # game
-    private int $round = 0;
-    private string $currentPlayer;
+    private int $round = 1;
+    private CardCollection $cards;
 
     private int $currentSmallBlind;
     private int $currentBigBlind;
@@ -56,6 +57,8 @@ class Tournament
 
         $this->currentSmallBlind = $this->initialSmallBlind;
         $this->currentBigBlind   = $this->initialBigBlind;
+
+        $this->cards = new CardCollection();
     }
 
     public static function create(?Rules $rules = null): self
@@ -147,13 +150,15 @@ class Tournament
         return $this->players->count();
     }
 
-    public function start(): void
+    public function start(CardCollection $deck): void
     {
         if (false === $this->isReady()) {
             throw new RuntimeException('Tournament is not ready to start');
         }
 
         $this->status = TournamentStatus::STARTED;
+
+        $this->cards = $deck;
     }
 
     private function isReady(): bool
@@ -192,5 +197,23 @@ class Tournament
     public function isStarted(): bool
     {
         return $this->status === TournamentStatus::STARTED;
+    }
+
+    public function deck(): CardCollection
+    {
+        return $this->cards;
+    }
+
+    public function getRoundNo(): int
+    {
+        return $this->round;
+    }
+
+    /**
+     * @return Player[]
+     */
+    public function getPlayers(): array
+    {
+        return $this->players->toArray();
     }
 }

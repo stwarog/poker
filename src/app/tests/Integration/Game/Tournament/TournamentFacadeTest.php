@@ -43,16 +43,36 @@ class TournamentFacadeTest extends IntegrationTest
         $this->assertEquals($exceptedCount, $this->getDbCount('tournament_players'));
     }
 
+    /** @test */
+    public function start(): void
+    {
+        // Given
+        $exceptedCount = 2;
+        $tournament    = $this->facade->create(2, 4, 4000, 25, 50, true);
+
+        // When
+        $player1 = $this->facade->signUp($tournament);
+        $player2 = $this->facade->signUp($tournament);
+        $this->facade->join($tournament, $player1);
+        $this->facade->join($tournament, $player2);
+        $this->facade->start($tournament);
+
+        // Then
+        $this->assertTrue(true);
+//        $this->assertEquals($exceptedCount, $this->getDbCount('tournament_participants'));
+//        $this->assertEquals($exceptedCount, $this->getDbCount('tournament_players'));
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->connection->beginTransaction();
+//        $this->connection->beginTransaction();
         $this->facade = $this->c->get(TournamentFacade::class);
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-        $this->connection->commit();
+//        $this->connection->commit();
     }
 }

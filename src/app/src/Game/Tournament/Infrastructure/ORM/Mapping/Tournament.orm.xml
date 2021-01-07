@@ -11,6 +11,8 @@
 
         <field name="status" length="20"/>
 
+        <field name="cards" type="object"/>
+
         <field name="minPlayerCount" type="smallint">
             <options>
                 <option name="default">2</option>

@@ -13,11 +13,19 @@ abstract class AbstractId
         $this->id = $id;
     }
 
+    /**
+     * @param string $value
+     *
+     * @return static
+     */
     public static function fromString(string $value): self
     {
         return new static(new Uuid($value));
     }
 
+    /**
+     * @return static
+     */
     public static function create(): self
     {
         return new static(Uuid::random());
@@ -38,7 +46,7 @@ abstract class AbstractId
         return false === $this->id->isEqual($id->id);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toString();
     }

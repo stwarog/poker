@@ -12,5 +12,5 @@ interface CardCollectionInterface
 
     public function removeCard(Card $card): void;
 
-    public function pickCard(int $count): CardCollectionInterface;
+    public function pickCard(int $amount): CardCollectionInterface;
 }

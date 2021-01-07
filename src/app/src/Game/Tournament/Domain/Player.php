@@ -3,6 +3,7 @@
 namespace App\Game\Tournament\Domain;
 
 use App\Game\Chip;
+use App\Game\Shared\Domain\Cards\CardCollection;
 use Webmozart\Assert\Assert;
 
 class Player
@@ -10,10 +11,12 @@ class Player
     private string $id;
     private string $status = PlayerStatus::ACTIVE;
     private int $chips = 0;
+    private CardCollection $cards;
 
     public function __construct(?PlayerId $uuid = null)
     {
-        $this->id = $uuid ? (string) $uuid : (string) PlayerId::create();
+        $this->id    = $uuid ? (string) $uuid : (string) PlayerId::create();
+        $this->cards = new CardCollection();
     }
 
     public function getId(): PlayerId
@@ -55,5 +58,17 @@ class Player
     public function getStatus(): PlayerStatus
     {
         return new PlayerStatus($this->status);
+    }
+
+    public function pickCards(Tournament $t, int $amount): void
+    {
+        foreach ($t->deck()->pickCard($amount) as $card) {
+            $this->cards->addCard($card);
+        }
+    }
+
+    public function getCards(): CardCollection
+    {
+        return $this->cards;
     }
 }

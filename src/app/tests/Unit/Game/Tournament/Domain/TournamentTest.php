@@ -5,6 +5,7 @@ namespace App\Tests\Unit\Game\Tournament\Domain;
 
 
 use App\Game\Chip;
+use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Tournament\Domain\PlayerCount;
 use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Rules;
@@ -258,7 +259,6 @@ class TournamentTest extends TestCase
         $t->leave($p1);
     }
 
-
     /** @test */
     public function start__not_ready__throws_runtime_exception(): void
     {
@@ -271,6 +271,28 @@ class TournamentTest extends TestCase
         $t->publish();
         $p = $t->signUp();
         $t->join($p);
-        $t->start();
+        $t->start(new CardCollection());
+    }
+
+    /**
+     * 1
+     * @test
+     */
+    public function start(): void
+    {
+        // Given
+        $expectedStatus = TournamentStatus::STARTED();
+
+        // When
+        $t = new Tournament();
+        $t->publish();
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
+        $t->start(new CardCollection());
+
+        // Then
+        $this->assertEquals($expectedStatus, $t->getStatus());
     }
 }

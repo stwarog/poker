@@ -4,39 +4,84 @@
 namespace App\Game\Shared\Domain\Cards;
 
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Iterator;
 use OutOfBoundsException;
 
-class CardCollection extends ArrayCollection implements CardCollectionInterface
+class CardCollection implements CardCollectionInterface, Iterator
 {
+    private array $elements;
+
+    public function __construct(array $elements = [])
+    {
+        $this->elements = $elements;
+    }
+
     public function addCard(Card ...$cards): void
     {
         foreach ($cards as $card) {
-            $this->add($card);
+            $this->elements[] = $card;
         }
     }
 
     public function removeCard(Card $card): void
     {
-        $this->removeElement($card);
+        $this->elements = array_filter($this->elements, fn(Card $c) => (string) $c !== (string) $card);
     }
 
-    public function pickCard(int $count = 1): self
+    public function pickCard(int $amount = 1): self
     {
-        if ($count > $this->count()) {
+        if ($amount > $this->count()) {
             throw new OutOfBoundsException('There is no more cards');
         }
 
-        $elements = $this->slice(0, $count);
-        for ($c = 0; $c !== $count; $c++) {
-            $this->remove($c);
-        }
+        $new            = array_splice($this->elements, 0, $amount);
+        $this->elements = array_values($this->elements);
 
-        return new self($elements);
+        return new self($new);
+    }
+
+    public function count(): int
+    {
+        return count($this->elements);
     }
 
     public function hasCard(Card $card): bool
     {
-        return $this->contains($card);
+        return !empty(array_filter($this->elements, fn(Card $c) => (string) $c === (string) $card));
+    }
+
+    public function current()
+    {
+        return current($this->elements);
+    }
+
+    public function next()
+    {
+        next($this->elements);
+    }
+
+    public function key()
+    {
+        return key($this->elements);
+    }
+
+    public function valid()
+    {
+        return key($this->elements) !== null;
+    }
+
+    public function rewind()
+    {
+        reset($this->elements);
+    }
+
+    public function isEmpty()
+    {
+        return empty($this->elements);
+    }
+
+    public function getKeys(): array
+    {
+        return array_keys($this->elements);
     }
 }
