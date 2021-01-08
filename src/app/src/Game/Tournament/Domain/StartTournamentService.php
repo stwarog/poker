@@ -5,28 +5,23 @@ namespace App\Game\Tournament\Domain;
 
 
 use App\Game\Shared\Domain\Cards\CardFactoryInterface;
+use App\Game\Shared\Domain\Cards\ShuffleCardsServiceInterface;
 
 class StartTournamentService
 {
     private CardFactoryInterface $factory;
+    private ShuffleCardsServiceInterface $shuffleCardsService;
 
-    public function __construct(CardFactoryInterface $factory)
+    public function __construct(CardFactoryInterface $factory, ShuffleCardsServiceInterface $shuffleCardsService)
     {
-        $this->factory = $factory;
+        $this->factory             = $factory;
+        $this->shuffleCardsService = $shuffleCardsService;
     }
 
     public function start(Tournament $tournament): void
     {
-        $cards = $this->factory->create();
-        $tournament->start($cards);
-
-        $players = $tournament->getPlayers();
-
-        $players[0]->giveSmallBlind($tournament);
-        $players[1]->giveBigBlind($tournament);
-
-        foreach ($players as $player) {
-            $player->pickCards($tournament, 2);
-        }
+        $deck = $this->factory->create();
+        $this->shuffleCardsService->shuffle($deck);
+        $tournament->start($deck);
     }
 }

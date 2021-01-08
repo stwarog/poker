@@ -5,10 +5,6 @@ namespace App\Tests\Unit\Game\Tournament\Domain;
 
 
 use App\Game\Chip;
-use App\Game\Shared\Domain\Cards\Card;
-use App\Game\Shared\Domain\Cards\CardCollection;
-use App\Game\Shared\Domain\Cards\Color;
-use App\Game\Shared\Domain\Cards\Value;
 use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerRole;
 use App\Game\Tournament\Domain\PlayerStatus;
@@ -141,36 +137,6 @@ class PlayerTest extends TestCase
 
         // Then
         $this->assertTrue($expectedStatus->equals($p->getStatus()));
-    }
-
-    /** @test */
-    public function pickCards__takes_from_tournament_deck_and_puts_to_player(): void
-    {
-        // Given
-        $expectedCardsCount = 2;
-
-        // When
-        $deck = new CardCollection();
-        $deck->addCard(
-            new Card(Color::CLUB(), Value::EIGHT()),
-            new Card(Color::CLUB(), Value::ACE()),
-            new Card(Color::CLUB(), Value::TEN()),
-            new Card(Color::CLUB(), Value::THREE()),
-        );
-        $t = new Tournament();
-        $t->publish();
-        $p1 = $t->signUp();
-        $p2 = $t->signUp();
-        $t->join($p1);
-        $t->join($p2);
-        $t->start($deck);
-
-        // Then
-        foreach ($t->getPlayers() as $player) {
-            $player->pickCards($t, $expectedCardsCount);
-            $this->assertSame($expectedCardsCount, $player->getCards()->count());
-        }
-        $this->assertSame(0, $t->deck()->count());
     }
 
     /** @test */

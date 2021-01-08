@@ -159,6 +159,15 @@ class Tournament
         $this->status = TournamentStatus::STARTED;
 
         $this->cards = $deck;
+
+        $players = $this->getPlayers();
+
+        $players[0]->giveSmallBlind($this);
+        $players[1]->giveBigBlind($this);
+
+        foreach ($players as $player) {
+            $player->pickCards($this, 2);
+        }
     }
 
     private function isReady(): bool
