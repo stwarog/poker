@@ -4,6 +4,7 @@ namespace App\Game\Tournament\Domain;
 
 use App\Game\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
+use Exception;
 use RuntimeException;
 use Webmozart\Assert\Assert;
 
@@ -14,6 +15,7 @@ class Player
     private int $chips = 0;
     private CardCollection $cards;
     private string $role = PlayerRole::NONE;
+    private bool $hasTurn = false;
 
     public function __construct(?PlayerId $uuid = null)
     {
@@ -100,5 +102,21 @@ class Player
         }
         $this->role  = PlayerRole::BIG_BLIND;
         $this->chips = $this->chipsAmount()->take($tournament->currentBigBlind())->getValue();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function turn(): void
+    {
+        if ($this->hasTurn()) {
+            throw new Exception('Already has turn');
+        }
+        $this->hasTurn = true;
+    }
+
+    public function hasTurn(): bool
+    {
+        return $this->hasTurn;
     }
 }

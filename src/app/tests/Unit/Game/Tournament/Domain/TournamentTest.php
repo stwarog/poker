@@ -346,4 +346,52 @@ class TournamentTest extends TestCase
         $this->assertTrue($anySmallBlind);
         $this->assertTrue($anyBigBlind);
     }
+
+    /** @test */
+    public function start__when_two_players(): void
+    {
+        $this->markTestIncomplete('Need clarification');
+        // Except
+
+        // Given
+        
+        // When
+        
+        // Then
+    }
+
+    /** @test */
+    public function start__when_three_players__third_turn(): void
+    {
+        // Given
+        $t = Tournament::create();
+        $t->publish();
+
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $p3 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
+        $t->join($p3);
+
+        $deck = new CardCollection(
+            [
+                new Card(Color::CLUB(), Value::EIGHT()),
+                new Card(Color::CLUB(), Value::ACE()),
+                new Card(Color::CLUB(), Value::TEN()),
+                new Card(Color::CLUB(), Value::THREE()),
+                new Card(Color::CLUB(), Value::TEN()),
+                new Card(Color::CLUB(), Value::THREE()),
+            ]
+        );
+
+        // When
+        $t->start($deck);
+
+        // Then
+        $players = $t->getPlayers();
+        $thirdPlayerId = $players[2]->getId();
+
+        $this->assertTrue($thirdPlayerId->equals($t->getCurrentPlayer()));
+    }
 }

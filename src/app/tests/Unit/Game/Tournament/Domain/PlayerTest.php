@@ -9,6 +9,7 @@ use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerRole;
 use App\Game\Tournament\Domain\PlayerStatus;
 use App\Game\Tournament\Domain\Tournament;
+use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -193,5 +194,34 @@ class PlayerTest extends TestCase
         // When
         $p->giveBigBlind(Tournament::create());
         $p->giveBigBlind(Tournament::create());
+    }
+
+    /** @test */
+    public function turn(): void
+    {
+        // Given
+        $p = new Player();
+        $expectedStatus = true;
+
+        // When
+        $p->turn();
+
+        // Then
+        $this->assertSame($expectedStatus, $p->hasTurn());
+    }
+
+    /** @test */
+    public function turn__has_already_turn__throws_exception(): void
+    {
+        // Except
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Already has turn');
+
+        // Given
+        $p = new Player();
+
+        // When
+        $p->turn();
+        $p->turn();
     }
 }

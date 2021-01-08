@@ -36,6 +36,7 @@ class Tournament
     private Collection $participants; # signed up
     /** @var Player[]|Collection */
     private Collection $players; # joined to game
+    private string $currentPlayer;
 
     public function __construct(
         ?TournamentId $id = null,
@@ -165,6 +166,11 @@ class Tournament
         $players[0]->giveSmallBlind($this);
         $players[1]->giveBigBlind($this);
 
+        if (isset($players[2])) {
+            $nextPlayer = $players[2];
+            $this->setCurrentPlayer($nextPlayer);
+        }
+
         foreach ($players as $player) {
             $player->pickCards($this, 2);
         }
@@ -234,5 +240,21 @@ class Tournament
     public function currentBigBlind(): Chip
     {
         return new Chip($this->currentBigBlind);
+    }
+
+    public function getCurrentPlayer(): PlayerId
+    {
+        return PlayerId::fromString($this->currentPlayer);
+    }
+
+    /**
+     * @param Player $nextPlayer
+     *
+     * @throws Exception
+     */
+    private function setCurrentPlayer(Player $nextPlayer)
+    {
+        $nextPlayer->turn();
+        $this->currentPlayer = $nextPlayer->getId()->toString();
     }
 }
