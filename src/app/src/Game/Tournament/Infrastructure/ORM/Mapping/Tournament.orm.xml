@@ -11,7 +11,7 @@
 
         <field name="status" length="20"/>
 
-        <field name="cards" type="object"/>
+        <field name="deck" type="object"/>
 
         <field name="minPlayerCount" type="smallint">
             <options>

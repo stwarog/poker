@@ -36,9 +36,9 @@ class Chip
         return (string) $this->value;
     }
 
-    public function equals(Chip $chipsAmount): bool
+    public function equals(Chip $chips): bool
     {
-        return $this->value === $chipsAmount->getValue();
+        return $this->value === $chips->getValue();
     }
 
     public function getValue(): int

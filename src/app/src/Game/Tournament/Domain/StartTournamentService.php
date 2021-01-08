@@ -6,6 +6,8 @@ namespace App\Game\Tournament\Domain;
 
 use App\Game\Shared\Domain\Cards\CardFactoryInterface;
 use App\Game\Shared\Domain\Cards\ShuffleCardsServiceInterface;
+use App\Game\Shared\Domain\Table;
+use Exception;
 
 class StartTournamentService
 {
@@ -18,10 +20,15 @@ class StartTournamentService
         $this->shuffleCardsService = $shuffleCardsService;
     }
 
+    /**
+     * @param Tournament $tournament
+     *
+     * @throws Exception
+     */
     public function start(Tournament $tournament): void
     {
         $deck = $this->factory->create();
         $this->shuffleCardsService->shuffle($deck);
-        $tournament->start($deck);
+        $tournament->start(Table::create($deck, $tournament->getRules()));
     }
 }

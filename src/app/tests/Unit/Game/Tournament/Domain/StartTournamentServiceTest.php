@@ -7,6 +7,7 @@ namespace App\Unit\Game\Tournament\Domain;
 use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Cards\CardFactoryInterface;
 use App\Game\Shared\Domain\Cards\ShuffleCardsServiceInterface;
+use App\Game\Shared\Domain\Table;
 use App\Game\Tournament\Domain\StartTournamentService;
 use App\Game\Tournament\Domain\Tournament;
 use PHPUnit\Framework\TestCase;
@@ -21,8 +22,7 @@ class StartTournamentServiceTest extends TestCase
 
         $t = $this->createMock(Tournament::class);
         $t->expects($this->once())
-            ->method('start')
-            ->with($deck);
+            ->method('start');
 
         $factory = $this->createMock(CardFactoryInterface::class);
         $factory

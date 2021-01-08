@@ -4,6 +4,7 @@ namespace App\Game\Tournament\Domain;
 
 use App\Game\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
+use App\Game\Shared\Domain\Table;
 use Exception;
 use RuntimeException;
 use Webmozart\Assert\Assert;
@@ -36,7 +37,7 @@ class Player
 
     public function takeChips(Chip $amount): void
     {
-        $current   = $this->chipsAmount()->getValue();
+        $current   = $this->chips()->getValue();
         $requested = $amount->getValue();
 
         Assert::greaterThan($requested, 0, 'Can not take 0 value chip');
@@ -49,7 +50,7 @@ class Player
         }
     }
 
-    public function chipsAmount(): Chip
+    public function chips(): Chip
     {
         return new Chip($this->chips);
     }
@@ -64,11 +65,11 @@ class Player
         return new PlayerStatus($this->status);
     }
 
-    public function pickCards(Tournament $t, int $amount): void
+    public function pickCards(Table $t, int $amount): void
     {
-        foreach ($t->deck()->pickCard($amount) as $card) {
-            $this->cards->addCard($card);
-        }
+        $this->cards->addCards(
+            $t->pickCard($amount)
+        );
     }
 
     public function getCards(): CardCollection
@@ -86,22 +87,26 @@ class Player
         return $this->role === PlayerRole::BIG_BLIND;
     }
 
-    public function giveSmallBlind(Tournament $tournament)
+    public function giveSmallBlind(Table $table): void
     {
         if ($this->role !== PlayerRole::NONE) {
             throw new RuntimeException('Player can not have any role to give small blind');
         }
         $this->role  = PlayerRole::SMALL_BLIND;
-        $this->chips = $this->chipsAmount()->take($tournament->currentSmallBlind())->getValue();
+        $amount      = $table->currentSmallBlind();
+        $this->chips = $this->chips()->take($amount)->getValue();
+        $table->putChips($amount);
     }
 
-    public function giveBigBlind(Tournament $tournament)
+    public function giveBigBlind(Table $table): void
     {
         if ($this->role !== PlayerRole::NONE) {
             throw new RuntimeException('Player can not have any role to give big blind');
         }
         $this->role  = PlayerRole::BIG_BLIND;
-        $this->chips = $this->chipsAmount()->take($tournament->currentBigBlind())->getValue();
+        $amount      = $table->currentBigBlind();
+        $this->chips = $this->chips()->take($amount)->getValue();
+        $table->putChips($amount);
     }
 
     /**

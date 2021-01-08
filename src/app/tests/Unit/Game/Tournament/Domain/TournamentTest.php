@@ -5,11 +5,8 @@ namespace App\Tests\Unit\Game\Tournament\Domain;
 
 
 use App\Game\Chip;
-use App\Game\Shared\Domain\Cards\Card;
-use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Cards\CardDeckFactory;
-use App\Game\Shared\Domain\Cards\Color;
-use App\Game\Shared\Domain\Cards\Value;
+use App\Game\Shared\Domain\Table;
 use App\Game\Tournament\Domain\PlayerCount;
 use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Rules;
@@ -22,12 +19,13 @@ use RuntimeException;
 
 class TournamentTest extends TestCase
 {
-    private CardCollection $deck;
+    private Table $table;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->deck = (new CardDeckFactory())->create();
+        $deck        = (new CardDeckFactory())->create();
+        $this->table = Table::create($deck, Rules::createDefaults());
     }
 
     /**
@@ -151,7 +149,7 @@ class TournamentTest extends TestCase
         $t = Tournament::create($r);
         $t->signUp();
         $t->signUp();
-        $t->startTournament();
+        $t->start($this->table);
         $t->signUp();
     }
 
@@ -283,7 +281,7 @@ class TournamentTest extends TestCase
         $t->publish();
         $p = $t->signUp();
         $t->join($p);
-        $t->start(new CardCollection());
+        $t->start($this->table);
     }
 
     /**
@@ -317,17 +315,14 @@ class TournamentTest extends TestCase
         $t->join($p1);
         $t->join($p2);
 
-        $deck = $this->deck;
+        $table = $this->table;
 
         $expectedCardsCount = 2;
 
-        $this->assertSame(1, $t->getRoundNo());
-
         // When
-        $t->start($deck);
+        $t->start($table);
 
         // Then
-        $this->assertEquals($deck, $t->deck());
 
         $anySmallBlind = false;
         $anyBigBlind   = false;
@@ -336,17 +331,31 @@ class TournamentTest extends TestCase
             $this->assertSame($expectedCardsCount, $player->getCards()->count());
 
             if ($player->hasSmallBlind()) {
-                $this->assertTrue($expectedSmallPlayerChips->equals($player->chipsAmount()));
+                $this->assertTrue(
+                    $expectedSmallPlayerChips->equals($player->chips()),
+                    sprintf(
+                        'Small blind should have #%s but have #%s',
+                        $expectedSmallPlayerChips->getValue(),
+                        $player->chips()->getValue()
+                    )
+                );
                 $anySmallBlind = true;
             }
 
             if ($player->hasBigBlind()) {
-                $this->assertTrue($expectedBigPlayerChips->equals($player->chipsAmount()));
+                $this->assertTrue(
+                    $expectedBigPlayerChips->equals($player->chips()),
+                    sprintf(
+                        'Big blind should have #%s but have #%s',
+                        $expectedBigPlayerChips->getValue(),
+                        $player->chips()->getValue()
+                    )
+                );
                 $anyBigBlind = true;
             }
         }
 
-        $this->assertSame($expectedDeckCardCountAfterStart, $t->deck()->count());
+        $this->assertSame($expectedDeckCardCountAfterStart, $table->deck()->count());
         $this->assertTrue($anySmallBlind);
         $this->assertTrue($anyBigBlind);
     }
@@ -363,7 +372,7 @@ class TournamentTest extends TestCase
         $t->join($p1);
         $t->join($p2);
 
-        $deck = $this->deck;
+        $deck = $this->table;
 
         // When
         $t->start($deck);
@@ -388,27 +397,26 @@ class TournamentTest extends TestCase
         $t->join($p2);
         $t->join($p3);
 
-        $deck = $this->deck;
+        $table = $this->table;
 
         // When
-        $t->start($deck);
+        $t->start($table);
 
         // Then
-        $players = $t->getPlayers();
-        $thirdPlayer = $players[2];
+        $players       = $t->getPlayers();
+        $thirdPlayer   = $players[2];
         $thirdPlayerId = $thirdPlayer->getId();
 
         $this->assertTrue($thirdPlayerId->equals($t->getCurrentPlayer()));
         $this->assertTrue($thirdPlayer->hasTurn());
     }
 
-
     /** @test */
     public function start__tournament_receives_flop(): void
     {
         // Given
-        $expectedFlopCount = 3;
-        $expectedDeckCountAfterFlop = 52 - (3*2) - $expectedFlopCount;
+        $expectedFlopCount          = 3;
+        $expectedDeckCountAfterFlop = 52 - (3 * 2) - $expectedFlopCount;
 
         $t = Tournament::create();
         $t->publish();
@@ -420,13 +428,53 @@ class TournamentTest extends TestCase
         $t->join($p2);
         $t->join($p3);
 
-        $deck = $this->deck;
+        $table = $this->table;
 
         // When
-        $t->start($deck);
+        $t->start($table);
 
         // Then
-        $this->assertSame($expectedDeckCountAfterFlop, $t->deck()->count());
-        $this->assertEquals($expectedFlopCount, $t->tableCards()->count());
+        $this->assertSame($expectedDeckCountAfterFlop, $table->deck()->count());
+        $this->assertEquals($expectedFlopCount, $table->cards()->count());
+    }
+
+    /** @test */
+    public function start__tournament_receives_blinds_values(): void
+    {
+        // Given
+        $initialChips      = new Chip(100);
+        $initialSmallBlind = new Chip(5);
+        $initialBigBlind   = new Chip(10);
+
+        $rules = new Rules(
+            new PlayerCount(2, 5),
+            $initialChips,
+            $initialSmallBlind,
+            $initialBigBlind,
+        );
+
+        $expectedTableChips = new Chip(15);
+
+        $t = Tournament::create($rules);
+        $t->publish();
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
+
+        $table = $this->table;
+
+        // When
+        $t->start($table);
+
+        // Then
+        $this->assertTrue(
+            $expectedTableChips->equals($table->getChips()),
+            sprintf(
+                'Expected to have #%s chips on the table, but have #%s',
+                (string) $expectedTableChips,
+                (string) $table->getChips()
+            )
+        );
     }
 }

@@ -5,10 +5,11 @@ namespace App\Tests\Unit\Game\Tournament\Domain;
 
 
 use App\Game\Chip;
+use App\Game\Shared\Domain\Cards\CardCollection;
+use App\Game\Shared\Domain\Table;
 use App\Game\Tournament\Domain\Player;
-use App\Game\Tournament\Domain\PlayerRole;
 use App\Game\Tournament\Domain\PlayerStatus;
-use App\Game\Tournament\Domain\Tournament;
+use App\Game\Tournament\Domain\Rules;
 use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -21,12 +22,12 @@ class PlayerTest extends TestCase
     {
         // Given
         $expectedChipAmount = new Chip(0);
-        $expectedRole       = PlayerRole::NONE();
+
         // When
         $p = new Player();
 
         // Then
-        $this->assertTrue($expectedChipAmount->equals($p->chipsAmount()));
+        $this->assertTrue($expectedChipAmount->equals($p->chips()));
         $this->assertFalse($p->hasBigBlind());
         $this->assertFalse($p->hasSmallBlind());
     }
@@ -46,7 +47,7 @@ class PlayerTest extends TestCase
         $p->addChips(new Chip(Chip::RED25));
 
         // Then
-        $this->assertTrue($expected->equals($p->chipsAmount()));
+        $this->assertTrue($expected->equals($p->chips()));
     }
 
     /** @test */
@@ -77,7 +78,7 @@ class PlayerTest extends TestCase
         $p->takeChips($take);
 
         // Then
-        $this->assertTrue($expected->equals($p->chipsAmount()));
+        $this->assertTrue($expected->equals($p->chips()));
     }
 
     /** @test */
@@ -145,9 +146,10 @@ class PlayerTest extends TestCase
     {
         // Given
         $p = new Player();
+        $t = Table::create(new CardCollection(), Rules::createDefaults());
 
         // When
-        $p->giveSmallBlind(Tournament::create());
+        $p->giveSmallBlind($t);
 
         // Then
         $this->assertTrue($p->hasSmallBlind());
@@ -162,10 +164,11 @@ class PlayerTest extends TestCase
 
         // Given
         $p = new Player();
+        $t = Table::create(new CardCollection(), Rules::createDefaults());
 
         // When
-        $p->giveSmallBlind(Tournament::create());
-        $p->giveSmallBlind(Tournament::create());
+        $p->giveSmallBlind($t);
+        $p->giveSmallBlind($t);
     }
 
     /** @test */
@@ -173,9 +176,10 @@ class PlayerTest extends TestCase
     {
         // Given
         $p = new Player();
+        $t = Table::create(new CardCollection(), Rules::createDefaults());
 
         // When
-        $p->giveBigBlind(Tournament::create());
+        $p->giveBigBlind($t);
 
         // Then
         $this->assertTrue($p->hasBigBlind());
@@ -190,17 +194,18 @@ class PlayerTest extends TestCase
 
         // Given
         $p = new Player();
+        $t = Table::create(new CardCollection(), Rules::createDefaults());
 
         // When
-        $p->giveBigBlind(Tournament::create());
-        $p->giveBigBlind(Tournament::create());
+        $p->giveBigBlind($t);
+        $p->giveBigBlind($t);
     }
 
     /** @test */
     public function turn(): void
     {
         // Given
-        $p = new Player();
+        $p              = new Player();
         $expectedStatus = true;
 
         // When

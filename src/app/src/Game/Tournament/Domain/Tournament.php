@@ -4,7 +4,7 @@ namespace App\Game\Tournament\Domain;
 
 
 use App\Game\Chip;
-use App\Game\Shared\Domain\Cards\CardCollection;
+use App\Game\Shared\Domain\Table;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Exception;
@@ -25,19 +25,12 @@ class Tournament
     private int $initialSmallBlind;
     private int $initialBigBlind;
 
-    # game
-    private int $round = 1;
-    private CardCollection $cards;
-
-    private int $currentSmallBlind;
-    private int $currentBigBlind;
-
     /** @var Player[]|Collection */
     private Collection $participants; # signed up
     /** @var Player[]|Collection */
     private Collection $players; # joined to game
-    private string $currentPlayer;
-    private CardCollection $tableCards;
+
+    private ?Table $table = null;
 
     public function __construct(
         ?TournamentId $id = null,
@@ -56,12 +49,6 @@ class Tournament
         $this->initialChipsPerPlayer = $rules->getInitialChipsPerPlayer()->getValue();
         $this->initialSmallBlind     = $rules->getInitialSmallBlind()->getValue();
         $this->initialBigBlind       = $rules->getInitialBigBlind()->getValue();
-
-        $this->currentSmallBlind = $this->initialSmallBlind;
-        $this->currentBigBlind   = $this->initialBigBlind;
-
-        $this->cards      = new CardCollection();
-        $this->tableCards = new CardCollection();
     }
 
     public static function create(?Rules $rules = null): self
@@ -89,7 +76,8 @@ class Tournament
         }
 
         $p = new Player();
-        $p->addChips($this->getRules()->getInitialChipsPerPlayer());
+        $r = $this->getRules();
+        $p->addChips($r->getInitialChipsPerPlayer());
         $this->participants->set($p->getId()->toString(), $p);
 
         return $p->getId();
@@ -105,7 +93,7 @@ class Tournament
         return $this->participants->count();
     }
 
-    private function getRules(): Rules
+    public function getRules(): Rules
     {
         return new Rules(
             new PlayerCount($this->minPlayerCount, $this->maxPlayerCount),
@@ -153,7 +141,12 @@ class Tournament
         return $this->players->count();
     }
 
-    public function start(CardCollection $deck): void
+    /**
+     * @param Table $table
+     *
+     * @throws Exception
+     */
+    public function start(Table $table): void
     {
         if (false === $this->isReady()) {
             throw new RuntimeException('Tournament is not ready to start');
@@ -161,24 +154,22 @@ class Tournament
 
         $this->status = TournamentStatus::STARTED;
 
-        $this->cards = $deck;
+        $this->table = $table;
+        $table->initialize($this->getRules());
 
         $players = $this->getPlayers();
 
-        $players[0]->giveSmallBlind($this);
-        $players[1]->giveBigBlind($this);
+        $players[0]->giveSmallBlind($table);
+        $players[1]->giveBigBlind($table);
 
         $nextPlayer = $this->getNextPlayer();
-        $this->setCurrentPlayer($nextPlayer);
+        $this->table->setCurrentPlayer($nextPlayer);
 
         foreach ($players as $player) {
-            $player->pickCards($this, 2);
+            $player->pickCards($table, 2);
         }
 
-        # flop
-        $this->tableCards->addCards(
-            $this->deck()->pickCard(3)
-        );
+        $table->revealCards(3);
     }
 
     private function isReady(): bool
@@ -211,27 +202,12 @@ class Tournament
 
     public function getPlayerChips(PlayerId $p): Chip
     {
-        return $this->players->get($p->toString())->chipsAmount();
+        return $this->players->get($p->toString())->chips();
     }
 
     public function isStarted(): bool
     {
         return $this->status === TournamentStatus::STARTED;
-    }
-
-    public function deck(): CardCollection
-    {
-        return $this->cards;
-    }
-
-    public function tableCards(): CardCollection
-    {
-        return $this->tableCards;
-    }
-
-    public function getRoundNo(): int
-    {
-        return $this->round;
     }
 
     /**
@@ -242,30 +218,9 @@ class Tournament
         return array_values($this->players->toArray());
     }
 
-    public function currentSmallBlind(): Chip
-    {
-        return new Chip($this->currentSmallBlind);
-    }
-
-    public function currentBigBlind(): Chip
-    {
-        return new Chip($this->currentBigBlind);
-    }
-
     public function getCurrentPlayer(): PlayerId
     {
-        return PlayerId::fromString($this->currentPlayer);
-    }
-
-    /**
-     * @param Player $nextPlayer
-     *
-     * @throws Exception
-     */
-    private function setCurrentPlayer(Player $nextPlayer)
-    {
-        $nextPlayer->turn();
-        $this->currentPlayer = $nextPlayer->getId()->toString();
+        return $this->table->getCurrentPlayer();
     }
 
     private function getNextPlayer(): Player
