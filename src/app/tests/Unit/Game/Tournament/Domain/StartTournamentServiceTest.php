@@ -4,6 +4,7 @@
 namespace App\Unit\Game\Tournament\Domain;
 
 
+use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Cards\CardFactoryInterface;
 use App\Game\Shared\Domain\Cards\ShuffleCardsServiceInterface;
 use App\Game\Tournament\Domain\StartTournamentService;
@@ -16,18 +17,18 @@ class StartTournamentServiceTest extends TestCase
     public function start__with_shuffled_deck(): void
     {
         // Given
-        $t = Tournament::create();
-        $t->publish();
+        $deck = new CardCollection();
 
-        $p1 = $t->signUp();
-        $p2 = $t->signUp();
-        $t->join($p1);
-        $t->join($p2);
+        $t = $this->createMock(Tournament::class);
+        $t->expects($this->once())
+            ->method('start')
+            ->with($deck);
 
         $factory = $this->createMock(CardFactoryInterface::class);
         $factory
             ->expects($this->once())
-            ->method('create');
+            ->method('create')
+            ->willReturn($deck);
 
         $shuffle = $this->createMock(ShuffleCardsServiceInterface::class);
         $shuffle
