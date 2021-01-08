@@ -354,14 +354,24 @@ class TournamentTest extends TestCase
     /** @test */
     public function start__when_two_players(): void
     {
-        $this->markTestIncomplete('Need clarification');
-        // Except
-
         // Given
-        
+        $t = Tournament::create();
+        $t->publish();
+
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
+
+        $deck = $this->deck;
+
         // When
-        
+        $t->start($deck);
+
         // Then
+        $players = $t->getPlayers();
+
+        $this->assertTrue($players[0]->hasTurn());
     }
 
     /** @test */
@@ -385,9 +395,11 @@ class TournamentTest extends TestCase
 
         // Then
         $players = $t->getPlayers();
-        $thirdPlayerId = $players[2]->getId();
+        $thirdPlayer = $players[2];
+        $thirdPlayerId = $thirdPlayer->getId();
 
         $this->assertTrue($thirdPlayerId->equals($t->getCurrentPlayer()));
+        $this->assertTrue($thirdPlayer->hasTurn());
     }
 
 
