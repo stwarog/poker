@@ -31,11 +31,6 @@ abstract class AbstractId
         return new static(Uuid::random());
     }
 
-    public function id(): Uuid
-    {
-        return $this->id;
-    }
-
     public function equals(self $id): bool
     {
         return $this->id->isEqual($id->id);

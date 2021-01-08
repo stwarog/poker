@@ -6,6 +6,8 @@ namespace App\Game\Tournament\Domain;
 use MyCLabs\Enum\Enum;
 
 /**
+ * @codeCoverageIgnore
+ *
  * @method static TournamentStatus ACTIVE()
  * @method static TournamentStatus LOST()
  * @method static TournamentStatus WON()

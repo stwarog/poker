@@ -5,6 +5,7 @@ namespace App\Tests\Unit\Game\Tournament\Domain;
 
 
 use App\Game\Chip;
+use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Cards\CardDeckFactory;
 use App\Game\Shared\Domain\Table;
 use App\Game\Tournament\Domain\PlayerCount;
@@ -20,12 +21,13 @@ use RuntimeException;
 class TournamentTest extends TestCase
 {
     private Table $table;
+    private CardCollection $deck;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $deck        = (new CardDeckFactory())->create();
-        $this->table = Table::create($deck, Rules::createDefaults());
+        $this->deck  = (new CardDeckFactory())->create();
+        $this->table = Table::create($this->deck, Rules::createDefaults());
     }
 
     /**
@@ -315,7 +317,7 @@ class TournamentTest extends TestCase
         $t->join($p1);
         $t->join($p2);
 
-        $table = $this->table;
+        $table = Table::create($this->deck, $rules);
 
         $expectedCardsCount = 2;
 
@@ -462,19 +464,66 @@ class TournamentTest extends TestCase
         $t->join($p1);
         $t->join($p2);
 
-        $table = $this->table;
+        $table = Table::create($this->deck, $rules);
 
         // When
         $t->start($table);
 
         // Then
         $this->assertTrue(
-            $expectedTableChips->equals($table->getChips()),
+            $expectedTableChips->equals($table->chips()),
             sprintf(
                 'Expected to have #%s chips on the table, but have #%s',
                 (string) $expectedTableChips,
-                (string) $table->getChips()
+                (string) $table->chips()
             )
         );
+    }
+
+    /** @test */
+    public function start__each_player_receives_initial_chips(): void
+    {
+        // Given
+        $initialChips      = new Chip(100);
+        $initialSmallBlind = new Chip(5);
+        $initialBigBlind   = new Chip(10);
+
+        $rules = new Rules(
+            new PlayerCount(2, 5),
+            $initialChips,
+            $initialSmallBlind,
+            $initialBigBlind,
+        );
+
+        $t = Tournament::create($rules);
+        $t->publish();
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
+
+        $table = Table::create($this->deck, $rules);
+
+        // When
+        $t->start($table);
+
+        // Then
+        foreach ($t->getPlayers() as $player) {
+            $expected = $initialChips->getValue();
+            $actual   = $player->chips()->getValue();
+
+            if ($player->hasBigBlind()) {
+                $expected -= $initialBigBlind->getValue();
+            }
+            if ($player->hasSmallBlind()) {
+                $expected -= $initialSmallBlind->getValue();
+            }
+
+            $this->assertEquals(
+                $expected,
+                $actual,
+                sprintf('Players has not expected initial #%d chips, but #%s', $expected, $actual)
+            );
+        }
     }
 }

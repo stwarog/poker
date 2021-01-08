@@ -7,6 +7,8 @@ namespace App\Game\Tournament\Domain;
 use MyCLabs\Enum\Enum;
 
 /**
+ * @codeCoverageIgnore
+ *
  * @method static PlayerRole NONE()
  * @method static PlayerRole SMALL_BLIND()
  * @method static PlayerRole BIG_BLIND()

@@ -16,13 +16,6 @@ class CardCollection implements CardCollectionInterface, Iterator
         $this->elements = $elements;
     }
 
-    public function addCard(Card ...$cards): void
-    {
-        foreach ($cards as $card) {
-            $this->elements[] = $card;
-        }
-    }
-
     public function removeCard(Card $card): void
     {
         $this->elements = array_filter($this->elements, fn(Card $c) => (string) $c !== (string) $card);
@@ -89,6 +82,13 @@ class CardCollection implements CardCollectionInterface, Iterator
     {
         foreach ($cards as $card) {
             $this->addCard($card);
+        }
+    }
+
+    public function addCard(Card ...$cards): void
+    {
+        foreach ($cards as $card) {
+            $this->elements[] = $card;
         }
     }
 }

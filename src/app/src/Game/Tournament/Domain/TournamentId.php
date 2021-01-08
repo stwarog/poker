@@ -6,6 +6,9 @@ namespace App\Game\Tournament\Domain;
 
 use App\Shared\Common\AbstractId;
 
+/**
+ * @codeCoverageIgnore
+ */
 class TournamentId extends AbstractId
 {
 

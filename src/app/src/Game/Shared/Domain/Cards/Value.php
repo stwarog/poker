@@ -7,6 +7,8 @@ namespace App\Game\Shared\Domain\Cards;
 use MyCLabs\Enum\Enum;
 
 /**
+ * @codeCoverageIgnore
+ *
  * @method static self TWO()
  * @method static self THREE()
  * @method static self FOUR()

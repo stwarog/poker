@@ -155,7 +155,6 @@ class Tournament
         $this->status = TournamentStatus::STARTED;
 
         $this->table = $table;
-        $table->initialize($this->getRules());
 
         $players = $this->getPlayers();
 
@@ -175,6 +174,27 @@ class Tournament
     private function isReady(): bool
     {
         return $this->status === TournamentStatus::READY;
+    }
+
+    /**
+     * @return Player[]
+     */
+    public function getPlayers(): array
+    {
+        return array_values($this->players->toArray());
+    }
+
+    private function getNextPlayer(): Player
+    {
+        $players     = array_values($this->players->toArray());
+        $hasBigBlind = array_filter($players, fn(Player $p) => $p->hasBigBlind());
+        if (empty($hasBigBlind)) {
+            throw new RuntimeException('Attempted to get next player, but no Big Blind assigned');
+        }
+        $index = array_key_first($hasBigBlind);
+        $index++;
+
+        return isset($players[$index]) ? $players[$index] : $players[0];
     }
 
     public function leave(PlayerId $player): void
@@ -205,33 +225,8 @@ class Tournament
         return $this->players->get($p->toString())->chips();
     }
 
-    public function isStarted(): bool
-    {
-        return $this->status === TournamentStatus::STARTED;
-    }
-
-    /**
-     * @return Player[]
-     */
-    public function getPlayers(): array
-    {
-        return array_values($this->players->toArray());
-    }
-
     public function getCurrentPlayer(): PlayerId
     {
         return $this->table->getCurrentPlayer();
-    }
-
-    private function getNextPlayer(): Player
-    {
-        $players = array_values($this->players->toArray());
-        $hasBigBlind = array_filter($players, fn (Player $p) => $p->hasBigBlind());
-        if (empty($hasBigBlind)) {
-            throw new RuntimeException('Attempted to get next player, but no Big Blind assigned');
-        }
-        $index = array_key_first($hasBigBlind);
-        $index++;
-        return isset($players[$index]) ? $players[$index] : $players[0];
     }
 }

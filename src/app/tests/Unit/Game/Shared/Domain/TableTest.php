@@ -41,7 +41,7 @@ class TableTest extends TestCase
 
         // Then
         $this->assertSame($expectedRound, $t->getRound());
-        $this->assertEquals($expectedChips, $t->getChips());
+        $this->assertEquals($expectedChips, $t->chips());
     }
 
     /** @test */

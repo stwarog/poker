@@ -6,6 +6,9 @@ namespace App\Game\Shared\Domain;
 
 use App\Shared\Common\AbstractId;
 
+/**
+ * @codeCoverageIgnore
+ */
 class TableId extends AbstractId
 {
 }

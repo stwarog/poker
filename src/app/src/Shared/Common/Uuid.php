@@ -8,6 +8,9 @@ use InvalidArgumentException;
 use Ramsey\Uuid\Uuid as RamseyUuid;
 use function preg_match;
 
+/**
+ * @codeCoverageIgnore
+ */
 final class Uuid
 {
     private string $value;
