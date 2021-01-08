@@ -75,7 +75,7 @@ class CardCollection implements CardCollectionInterface, Iterator
         reset($this->elements);
     }
 
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->elements);
     }
@@ -83,5 +83,12 @@ class CardCollection implements CardCollectionInterface, Iterator
     public function getKeys(): array
     {
         return array_keys($this->elements);
+    }
+
+    public function addCards(CardCollection $cards): void
+    {
+        foreach ($cards as $card) {
+            $this->addCard($card);
+        }
     }
 }

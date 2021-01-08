@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Game\Tournament\Domain;
 use App\Game\Chip;
 use App\Game\Shared\Domain\Cards\Card;
 use App\Game\Shared\Domain\Cards\CardCollection;
+use App\Game\Shared\Domain\Cards\CardDeckFactory;
 use App\Game\Shared\Domain\Cards\Color;
 use App\Game\Shared\Domain\Cards\Value;
 use App\Game\Tournament\Domain\PlayerCount;
@@ -21,6 +22,14 @@ use RuntimeException;
 
 class TournamentTest extends TestCase
 {
+    private CardCollection $deck;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->deck = (new CardDeckFactory())->create();
+    }
+
     /**
      * 0
      * @test
@@ -284,6 +293,8 @@ class TournamentTest extends TestCase
     public function start__blinds_and_two_cards_assigned_each_player(): void
     {
         // Given
+        $expectedDeckCardCountAfterStart = 52 - 4 - 3;
+
         $initialChips      = new Chip(100);
         $initialSmallBlind = new Chip(5);
         $initialBigBlind   = new Chip(10);
@@ -306,14 +317,7 @@ class TournamentTest extends TestCase
         $t->join($p1);
         $t->join($p2);
 
-        $deck = new CardCollection(
-            [
-                new Card(Color::CLUB(), Value::EIGHT()),
-                new Card(Color::CLUB(), Value::ACE()),
-                new Card(Color::CLUB(), Value::TEN()),
-                new Card(Color::CLUB(), Value::THREE()),
-            ]
-        );
+        $deck = $this->deck;
 
         $expectedCardsCount = 2;
 
@@ -342,7 +346,7 @@ class TournamentTest extends TestCase
             }
         }
 
-        $this->assertTrue($t->deck()->isEmpty());
+        $this->assertSame($expectedDeckCardCountAfterStart, $t->deck()->count());
         $this->assertTrue($anySmallBlind);
         $this->assertTrue($anyBigBlind);
     }
@@ -374,16 +378,7 @@ class TournamentTest extends TestCase
         $t->join($p2);
         $t->join($p3);
 
-        $deck = new CardCollection(
-            [
-                new Card(Color::CLUB(), Value::EIGHT()),
-                new Card(Color::CLUB(), Value::ACE()),
-                new Card(Color::CLUB(), Value::TEN()),
-                new Card(Color::CLUB(), Value::THREE()),
-                new Card(Color::CLUB(), Value::TEN()),
-                new Card(Color::CLUB(), Value::THREE()),
-            ]
-        );
+        $deck = $this->deck;
 
         // When
         $t->start($deck);
@@ -393,5 +388,33 @@ class TournamentTest extends TestCase
         $thirdPlayerId = $players[2]->getId();
 
         $this->assertTrue($thirdPlayerId->equals($t->getCurrentPlayer()));
+    }
+
+
+    /** @test */
+    public function start__tournament_receives_flop(): void
+    {
+        // Given
+        $expectedFlopCount = 3;
+        $expectedDeckCountAfterFlop = 52 - (3*2) - $expectedFlopCount;
+
+        $t = Tournament::create();
+        $t->publish();
+
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $p3 = $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
+        $t->join($p3);
+
+        $deck = $this->deck;
+
+        // When
+        $t->start($deck);
+
+        // Then
+        $this->assertSame($expectedDeckCountAfterFlop, $t->deck()->count());
+        $this->assertEquals($expectedFlopCount, $t->tableCards()->count());
     }
 }

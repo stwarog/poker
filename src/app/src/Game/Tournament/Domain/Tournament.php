@@ -37,6 +37,7 @@ class Tournament
     /** @var Player[]|Collection */
     private Collection $players; # joined to game
     private string $currentPlayer;
+    private CardCollection $tableCards;
 
     public function __construct(
         ?TournamentId $id = null,
@@ -59,7 +60,8 @@ class Tournament
         $this->currentSmallBlind = $this->initialSmallBlind;
         $this->currentBigBlind   = $this->initialBigBlind;
 
-        $this->cards = new CardCollection();
+        $this->cards      = new CardCollection();
+        $this->tableCards = new CardCollection();
     }
 
     public static function create(?Rules $rules = null): self
@@ -174,6 +176,11 @@ class Tournament
         foreach ($players as $player) {
             $player->pickCards($this, 2);
         }
+
+        # flop
+        $this->tableCards->addCards(
+            $this->deck()->pickCard(3)
+        );
     }
 
     private function isReady(): bool
@@ -217,6 +224,11 @@ class Tournament
     public function deck(): CardCollection
     {
         return $this->cards;
+    }
+
+    public function tableCards(): CardCollection
+    {
+        return $this->tableCards;
     }
 
     public function getRoundNo(): int

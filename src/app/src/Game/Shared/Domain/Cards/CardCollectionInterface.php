@@ -8,6 +8,8 @@ interface CardCollectionInterface
 {
     public function addCard(Card ...$cards): void;
 
+    public function addCards(CardCollection $cards): void;
+
     public function hasCard(Card $card): bool;
 
     public function removeCard(Card $card): void;
