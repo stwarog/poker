@@ -12,9 +12,6 @@ use App\Game\Tournament\Domain\TournamentByIdInterface;
 use App\Game\Tournament\Domain\TournamentId;
 use Exception;
 
-/**
- * @codeCoverageIgnore
- */
 final class TournamentFacade
 {
     private CreateTournamentService $createTournamentService;

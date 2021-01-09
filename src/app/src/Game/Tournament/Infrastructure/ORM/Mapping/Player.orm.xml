@@ -21,7 +21,7 @@
             </options>
         </field>
 
-<!--        <field name="cards" type="object"/>-->
+        <!--        <field name="cards" type="object"/>-->
 
         <field name="role" length="5">
             <options>
