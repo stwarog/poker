@@ -527,4 +527,64 @@ class TournamentTest extends TestCase
             );
         }
     }
+
+    /** @test */
+    public function fold__tournament_not_started__throws_runtime_exception(): void
+    {
+        // Except
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Tournament must be started to perform this action');
+
+        // Given
+        $player = PlayerId::create();
+
+        // When
+        $t = Tournament::create();
+        $t->fold($player);
+    }
+
+    /** @test */
+    public function call__tournament_not_started__throws_runtime_exception(): void
+    {
+        // Except
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Tournament must be started to perform this action');
+
+        // Given
+        $player = PlayerId::create();
+
+        // When
+        $t = Tournament::create();
+        $t->call($player);
+    }
+
+    /** @test */
+    public function raise__tournament_not_started__throws_runtime_exception(): void
+    {
+        // Except
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Tournament must be started to perform this action');
+
+        // Given
+        $player = PlayerId::create();
+
+        // When
+        $t = Tournament::create();
+        $t->raise($player, new Chip(20));
+    }
+
+    /** @test */
+    public function allIn__tournament_not_started__throws_runtime_exception(): void
+    {
+        // Except
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Tournament must be started to perform this action');
+
+        // Given
+        $player = PlayerId::create();
+
+        // When
+        $t = Tournament::create();
+        $t->allIn($player);
+    }
 }

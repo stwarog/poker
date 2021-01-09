@@ -215,4 +215,65 @@ class Tournament
     {
         return $this->table->getCurrentPlayer();
     }
+
+    /**
+     * @param PlayerId $id
+     *
+     * @throws Exception
+     */
+    public function fold(PlayerId $id): void
+    {
+        $this->verifyIsStarted();
+        $p = $this->getPlayer($id);
+        $p->fold($this->table);
+    }
+
+    /**
+     * @param PlayerId $id
+     *
+     * @throws Exception
+     */
+    public function call(PlayerId $id): void
+    {
+        $this->verifyIsStarted();
+        $p = $this->getPlayer($id);
+        $p->call($this->table);
+    }
+
+    /**
+     * @param PlayerId $id
+     * @param Chip     $amount
+     *
+     * @throws Exception
+     */
+    public function raise(PlayerId $id, Chip $amount): void
+    {
+        $this->verifyIsStarted();
+        $p = $this->getPlayer($id);
+        $p->raise($this->table, $amount);
+    }
+
+    /**
+     * @param PlayerId $id
+     *
+     * @throws Exception
+     */
+    public function allIn(PlayerId $id): void
+    {
+        $this->verifyIsStarted();
+        $p = $this->getPlayer($id);
+        $p->allIn($this->table);
+    }
+
+    private function getPlayer(PlayerId $playerId): Player
+    {
+        return $this->players->get($playerId->toString());
+    }
+
+    private function verifyIsStarted(): bool
+    {
+        if ($this->status !== TournamentStatus::STARTED) {
+            throw new RuntimeException('Tournament must be started to perform this action');
+        }
+    }
 }
