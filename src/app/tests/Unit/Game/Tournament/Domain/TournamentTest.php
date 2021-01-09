@@ -375,10 +375,10 @@ class TournamentTest extends TestCase
         $t->join($p1);
         $t->join($p2);
 
-        $deck = $this->table;
+        $table = Table::create($this->deck, $t);
 
         // When
-        $t->start($deck);
+        $t->start($table);
 
         // Then
         $players = $t->getPlayers();
@@ -400,7 +400,7 @@ class TournamentTest extends TestCase
         $t->join($p2);
         $t->join($p3);
 
-        $table = $this->table;
+        $table = Table::create($this->deck, $t);
 
         // When
         $t->start($table);
@@ -431,7 +431,7 @@ class TournamentTest extends TestCase
         $t->join($p2);
         $t->join($p3);
 
-        $table = $this->table;
+        $table = Table::create($this->deck, $t);
 
         // When
         $t->start($table);

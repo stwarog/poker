@@ -56,8 +56,10 @@ class TournamentFacadeTest extends IntegrationTest
         // When
         $player1 = $this->facade->signUp($id);
         $player2 = $this->facade->signUp($id);
+        $player3 = $this->facade->signUp($id);
         $this->facade->join($id, $player1);
         $this->facade->join($id, $player2);
+        $this->facade->join($id, $player3);
         $this->facade->start($id);
 
         // Then
@@ -67,8 +69,8 @@ class TournamentFacadeTest extends IntegrationTest
             $this->assertSame($exceptedCardCountPerPlayer, $player->getCards()->count());
         }
 
-        $this->assertEquals(2, $this->getDbCount('tournament_participants'));
-        $this->assertEquals(2, $this->getDbCount('tournament_players'));
+        $this->assertEquals(3, $this->getDbCount('tournament_participants'));
+        $this->assertEquals(3, $this->getDbCount('tournament_players'));
         $this->assertEquals(1, $this->getDbCount('tournament'));
         $this->assertEquals(1, $this->getDbCount('game_table'));
     }
@@ -76,13 +78,13 @@ class TournamentFacadeTest extends IntegrationTest
     protected function setUp(): void
     {
         parent::setUp();
-        $this->connection->beginTransaction();
+//        $this->connection->beginTransaction();
         $this->facade = $this->c->get(TournamentFacade::class);
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-        $this->connection->commit();
+//        $this->connection->commit();
     }
 }

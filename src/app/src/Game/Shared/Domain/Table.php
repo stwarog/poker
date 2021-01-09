@@ -9,7 +9,9 @@ use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Tournament;
+use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
+use RuntimeException;
 
 class Table
 {
@@ -111,14 +113,32 @@ class Table
         return $this->deck;
     }
 
-    public function nextPlayer()
+    /**
+     * @throws Exception
+     */
+    public function nextPlayer(): void
     {
-//        dump($this->tournament);
-//        $this->setCurrentPlayer();
+        # todo: refactor this shit
+        $asCollection = new ArrayCollection($this->tournament->getPlayers());
+        $current      = $this->getNextPlayer($asCollection);
+        $this->setCurrentPlayer($current);
     }
 
     public function getCurrentBet(): Chip
     {
         return new Chip($this->currentBet);
+    }
+
+    public function getNextPlayer(ArrayCollection $collection): Player
+    {
+        $players     = array_values($collection->toArray());
+        $hasBigBlind = array_filter($players, fn(Player $p) => $p->hasBigBlind());
+        if (empty($hasBigBlind)) {
+            throw new RuntimeException('Attempted to get next player, but no Big Blind assigned');
+        }
+        $index = array_key_first($hasBigBlind);
+        $index++;
+
+        return isset($players[$index]) ? $players[$index] : $players[0];
     }
 }

@@ -138,7 +138,6 @@ class Player
         $this->currentBet = $currentBet->getValue();
         $table->putChips($currentBet);
 
-
         $this->hasTurn = false;
         $table->nextPlayer();
     }

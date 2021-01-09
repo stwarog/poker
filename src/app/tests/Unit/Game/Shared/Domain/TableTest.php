@@ -92,4 +92,14 @@ class TableTest extends TestCase
         // Then
         $this->assertTrue($p->hasTurn(), 'It is not this player turn');
     }
+
+//    /** @test */
+    public function nextPlayer__switches_player(): void
+    {
+        // Given
+
+        // When
+
+        // Then
+    }
 }

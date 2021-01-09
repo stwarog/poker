@@ -161,8 +161,7 @@ class Tournament
         $players[0]->giveSmallBlind($table);
         $players[1]->giveBigBlind($table);
 
-        $nextPlayer = $this->getNextPlayer();
-        $this->table->setCurrentPlayer($nextPlayer);
+        $table->nextPlayer();
 
         foreach ($players as $player) {
             $player->pickCards($table, 2);
@@ -182,19 +181,6 @@ class Tournament
     public function getPlayers(): array
     {
         return array_values($this->players->toArray());
-    }
-
-    private function getNextPlayer(): Player
-    {
-        $players     = array_values($this->players->toArray());
-        $hasBigBlind = array_filter($players, fn(Player $p) => $p->hasBigBlind());
-        if (empty($hasBigBlind)) {
-            throw new RuntimeException('Attempted to get next player, but no Big Blind assigned');
-        }
-        $index = array_key_first($hasBigBlind);
-        $index++;
-
-        return isset($players[$index]) ? $players[$index] : $players[0];
     }
 
     public function leave(PlayerId $player): void
