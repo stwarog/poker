@@ -22,3 +22,9 @@ doctrine:
         dir: '%kernel.project_dir%/src/Game/Tournament/Infrastructure/ORM/Mapping'
         prefix: 'App\Game\Tournament\Domain'
         alias: Game
+      App\Game\Shared\Domain\Table:
+        is_bundle: false
+        type: xml
+        dir: '%kernel.project_dir%/src/Game/Shared/Infrastructure/ORM/Mapping'
+        prefix: 'App\Game\Shared\Domain'
+        alias: Game

@@ -9,6 +9,8 @@ use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Rules;
+use App\Game\Tournament\Domain\Tournament;
+use Doctrine\Common\Collections\ArrayCollection;
 use Exception;
 
 class Table

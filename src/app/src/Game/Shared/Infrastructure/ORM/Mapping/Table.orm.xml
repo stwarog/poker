@@ -3,29 +3,38 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                    https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
-    <entity name="App\Game\Tournament\Domain\Player" table="player">
+    <entity name="App\Game\Shared\Domain\Table" table="game_table">
 
         <id name="id" type="string" length="80">
             <generator strategy="NONE"/>
         </id>
 
-        <field name="status" length="6">
+        <field name="round" type="smallint">
             <options>
-                <option name="default">active</option>
+                <option name="default">1</option>
             </options>
         </field>
 
-        <field name="chips" type="smallint">
+        <field name="cards" type="object"/>
+        <field name="deck" type="object"/>
+
+        <field name="chips" type="integer">
             <options>
                 <option name="default">0</option>
             </options>
         </field>
 
-<!--        <field name="cards" type="object"/>-->
+        <field name="player" column="player_id" length="80" nullable="true"/>
 
-        <field name="role" length="5">
+        <field name="smallBlind" type="smallint">
             <options>
-                <option name="default">none</option>
+                <option name="default">25</option>
+            </options>
+        </field>
+
+        <field name="bigBlind" type="smallint">
+            <options>
+                <option name="default">50</option>
             </options>
         </field>
 

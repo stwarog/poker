@@ -11,8 +11,6 @@
 
         <field name="status" length="20"/>
 
-        <field name="deck" type="object"/>
-
         <field name="minPlayerCount" type="smallint">
             <options>
                 <option name="default">2</option>
@@ -70,6 +68,13 @@
                 </inverse-join-columns>
             </join-table>
         </many-to-many>
+
+        <many-to-one field="table" target-entity="App\Game\Shared\Domain\Table">
+            <cascade>
+                <cascade-persist/>
+            </cascade>
+        </many-to-one>
+
     </entity>
 
 </doctrine-mapping>
