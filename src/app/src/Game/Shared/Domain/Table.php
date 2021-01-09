@@ -8,7 +8,7 @@ use App\Game\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerId;
-use App\Game\Tournament\Domain\Rules;
+use App\Game\Tournament\Domain\Tournament;
 use Exception;
 
 class Table
@@ -19,24 +19,31 @@ class Table
     private CardCollection $cards;
     private int $chips = 0;
     private ?string $player = null;
-    private int $smallBlind = 0;
-    private int $bigBlind = 0;
+    private int $smallBlind;
+    private int $bigBlind;
+    private Tournament $tournament;
+    private int $currentBet = 0;
 
-    public function __construct(TableId $id, CardCollection $deck, Rules $rules)
+    public function __construct(TableId $id, CardCollection $deck, Tournament $tournament)
     {
-        $this->id         = $id->toString();
-        $this->deck       = $deck;
-        $this->cards      = new CardCollection();
+        $this->id    = $id->toString();
+        $this->deck  = $deck;
+        $this->cards = new CardCollection();
+
+        $rules            = $tournament->getRules();
         $this->smallBlind = $rules->getInitialSmallBlind()->getValue();
         $this->bigBlind   = $rules->getInitialBigBlind()->getValue();
+        $this->currentBet = $rules->getInitialBigBlind()->getValue();
+
+        $this->tournament = $tournament;
     }
 
-    public static function create(CardCollection $deck, Rules $rules): self
+    public static function create(CardCollection $deck, Tournament $tournament): self
     {
         return new self(
             TableId::create(),
             $deck,
-            $rules
+            $tournament
         );
     }
 
@@ -102,5 +109,16 @@ class Table
     public function deck(): CardCollection
     {
         return $this->deck;
+    }
+
+    public function nextPlayer()
+    {
+//        dump($this->tournament);
+//        $this->setCurrentPlayer();
+    }
+
+    public function getCurrentBet(): Chip
+    {
+        return new Chip($this->currentBet);
     }
 }

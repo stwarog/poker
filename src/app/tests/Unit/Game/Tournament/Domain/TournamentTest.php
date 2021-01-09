@@ -22,12 +22,13 @@ class TournamentTest extends TestCase
 {
     private Table $table;
     private CardCollection $deck;
-
+    private Tournament $tournament;
     protected function setUp(): void
     {
         parent::setUp();
-        $this->deck  = (new CardDeckFactory())->create();
-        $this->table = Table::create($this->deck, Rules::createDefaults());
+        $this->deck       = (new CardDeckFactory())->create();
+        $this->tournament = Tournament::create();
+        $this->table      = Table::create($this->deck, $this->tournament);
     }
 
     /**
@@ -317,7 +318,7 @@ class TournamentTest extends TestCase
         $t->join($p1);
         $t->join($p2);
 
-        $table = Table::create($this->deck, $rules);
+        $table = Table::create($this->deck, $t);
 
         $expectedCardsCount = 2;
 
@@ -464,7 +465,7 @@ class TournamentTest extends TestCase
         $t->join($p1);
         $t->join($p2);
 
-        $table = Table::create($this->deck, $rules);
+        $table = Table::create($this->deck, $t);
 
         // When
         $t->start($table);
@@ -502,7 +503,7 @@ class TournamentTest extends TestCase
         $t->join($p1);
         $t->join($p2);
 
-        $table = Table::create($this->deck, $rules);
+        $table = Table::create($this->deck, $t);
 
         // When
         $t->start($table);

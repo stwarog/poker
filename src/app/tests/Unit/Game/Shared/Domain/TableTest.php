@@ -32,16 +32,19 @@ class TableTest extends TestCase
     public function create__table(): void
     {
         // Given
-        $deck          = $this->deck;
-        $expectedRound = 1;
-        $expectedChips = new Chip(0);
+        $deck               = $this->deck;
+        $expectedRound      = 1;
+        $expectedChips      = new Chip(0);
+        $rules              = $this->tournament->getRules();
+        $expectedCurrentBet = $rules->getInitialBigBlind();
 
         // When
-        $t = Table::create($deck, $this->tournament->getRules());
+        $t = Table::create($deck, $this->tournament);
 
         // Then
         $this->assertSame($expectedRound, $t->getRound());
         $this->assertEquals($expectedChips, $t->chips());
+        $this->assertEquals($expectedCurrentBet, $t->getCurrentBet());
     }
 
     /** @test */
@@ -52,7 +55,7 @@ class TableTest extends TestCase
         $expectedDeckCount = 50;
 
         // When
-        $t = Table::create($deck, $this->tournament->getRules());
+        $t = Table::create($deck, $this->tournament);
         $t->pickCard(2);
 
         // Then
@@ -68,7 +71,7 @@ class TableTest extends TestCase
         $expectedTakenCount = 3;
 
         // When
-        $t     = Table::create($deck, $this->tournament->getRules());
+        $t     = Table::create($deck, $this->tournament);
         $taken = $t->revealCards(3);
 
         // Then
@@ -80,7 +83,7 @@ class TableTest extends TestCase
     public function setCurrentPlayer__makes_turn(): void
     {
         // Given
-        $t = Table::create($this->deck, Rules::createDefaults());
+        $t = Table::create($this->deck, $this->tournament);
         $p = new Player();
 
         // When

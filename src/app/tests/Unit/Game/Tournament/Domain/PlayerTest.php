@@ -9,7 +9,7 @@ use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Table;
 use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerStatus;
-use App\Game\Tournament\Domain\Rules;
+use App\Game\Tournament\Domain\Tournament;
 use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +17,16 @@ use RuntimeException;
 
 class PlayerTest extends TestCase
 {
+    private Tournament $tournament;
+    private Table $table;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->tournament = Tournament::create();
+        $this->table      = Table::create(new CardCollection(), $this->tournament);
+    }
+
     /** @test */
     public function player__new__has_no_chips(): void
     {
@@ -146,7 +156,7 @@ class PlayerTest extends TestCase
     {
         // Given
         $p = new Player();
-        $t = Table::create(new CardCollection(), Rules::createDefaults());
+        $t = Table::create(new CardCollection(), $this->tournament);
 
         // When
         $p->giveSmallBlind($t);
@@ -164,7 +174,7 @@ class PlayerTest extends TestCase
 
         // Given
         $p = new Player();
-        $t = Table::create(new CardCollection(), Rules::createDefaults());
+        $t = Table::create(new CardCollection(), $this->tournament);
 
         // When
         $p->giveSmallBlind($t);
@@ -176,7 +186,7 @@ class PlayerTest extends TestCase
     {
         // Given
         $p = new Player();
-        $t = Table::create(new CardCollection(), Rules::createDefaults());
+        $t = Table::create(new CardCollection(), $this->tournament);
 
         // When
         $p->giveBigBlind($t);
@@ -194,7 +204,7 @@ class PlayerTest extends TestCase
 
         // Given
         $p = new Player();
-        $t = Table::create(new CardCollection(), Rules::createDefaults());
+        $t = Table::create(new CardCollection(), $this->tournament);
 
         // When
         $p->giveBigBlind($t);
@@ -228,5 +238,235 @@ class PlayerTest extends TestCase
         // When
         $p->turn();
         $p->turn();
+    }
+
+    /**
+     * 1
+     * @test
+     */
+    public function fold__has_turn__changes_player(): void
+    {
+        // Given
+        $p              = new Player();
+        $expectedStatus = false;
+
+        $table = $this->createMock(Table::class);
+        $table
+            ->expects($this->once())
+            ->method('nextPlayer');
+
+        // When
+        $p->turn();
+        $p->fold($table);
+
+        // Then
+        $this->assertSame($expectedStatus, $p->hasTurn());
+    }
+
+    /** @test */
+    public function fold__player_has_no_turn__throws_exception(): void
+    {
+        // Except
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Not this player turn');
+
+        // Given
+        $p = new Player();
+
+        // When
+        $p->fold($this->table);
+    }
+
+    /** @test */
+    public function call__has_turn__changes_player(): void
+    {
+        // Given
+        $p = new Player();
+        $p->addChips(new Chip(20));
+        $expectedStatus           = false;
+        $expectedPlayerCurrentBet = new Chip(20);
+
+        $table = $this->createMock(Table::class);
+
+        $table
+            ->expects($this->once())
+            ->method('getCurrentBet')
+            ->willReturn(new Chip(20));
+
+        $table
+            ->expects($this->once())
+            ->method('nextPlayer');
+
+        // When
+        $p->turn();
+        $p->call($table);
+
+        // Then
+        $this->assertSame($expectedStatus, $p->hasTurn());
+        $this->assertEquals($expectedPlayerCurrentBet, $p->getCurrentBet());
+    }
+
+    /** @test */
+    public function call__has_turn__changes_player_transfers_current_bet_from_player_to_table(): void
+    {
+        // Given
+        $p = new Player();
+        $p->addChips(new Chip(50));
+
+        $expectedPlayerChips = new Chip(30);
+        $expectedStatus      = false;
+        $currentBet          = new Chip(20);
+
+        $table = $this->createMock(Table::class);
+
+        $table
+            ->expects($this->once())
+            ->method('getCurrentBet')
+            ->willReturn($currentBet);
+
+        $table
+            ->expects($this->once())
+            ->method('putChips')
+            ->with($currentBet);
+
+        // When
+        $p->turn();
+        $p->call($table);
+
+        // Then
+        $this->assertSame($expectedStatus, $p->hasTurn());
+        $this->assertEquals($expectedPlayerChips, $p->chips());
+    }
+
+    /** @test */
+    public function call__player_has_no_turn__throws_exception(): void
+    {
+        // Except
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Not this player turn');
+
+        // Given
+        $p = new Player();
+
+        // When
+        $p->call($this->table);
+    }
+
+    /** @test */
+    public function raise__has_turn__changes_player(): void
+    {
+        // Given
+        $p = new Player();
+        $p->addChips(new Chip(200));
+        $expectedStatus           = false;
+        $raiseChips               = new Chip(40);
+        $expectedPlayerCurrentBet = new Chip(40);
+
+        $table = $this->createMock(Table::class);
+
+        $table
+            ->expects($this->once())
+            ->method('nextPlayer');
+
+        // When
+        $p->turn();
+        $p->raise($table, $raiseChips);
+
+        // Then
+        $this->assertSame($expectedStatus, $p->hasTurn());
+        $this->assertEquals($expectedPlayerCurrentBet, $p->getCurrentBet());
+    }
+
+    /** @test */
+    public function raise__player_has_no_turn__throws_exception(): void
+    {
+        // Except
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Not this player turn');
+
+        // Given
+        $p = new Player();
+
+        // When
+        $p->raise($this->table, new Chip(20));
+    }
+
+    /** @test */
+    public function raise__has_turn__changes_player_transfers_raised_bet_from_player_to_table(): void
+    {
+        // Given
+        $p = new Player();
+        $p->addChips(new Chip(1000));
+
+        $expectedPlayerChips = new Chip(900);
+        $expectedStatus      = false;
+        $raiseChips          = new Chip(100);
+
+        $table = $this->createMock(Table::class);
+
+        $table
+            ->expects($this->once())
+            ->method('putChips')
+            ->with($raiseChips);
+
+        // When
+        $p->turn();
+        $p->raise($table, $raiseChips);
+
+        // Then
+        $this->assertSame($expectedStatus, $p->hasTurn());
+        $this->assertEquals($expectedPlayerChips, $p->chips());
+    }
+
+    /** @test */
+    public function raise__less_than_double_big_blind__throws_invalid_argument_exception(): void
+    {
+        // Except
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Bet must be at least twice big blind value');
+
+        // Given
+        $p = new Player();
+        $p->addChips(new Chip(1000));
+
+        $raiseChips = new Chip(100);
+
+        $table = $this->createMock(Table::class);
+
+        $table
+            ->expects($this->once())
+            ->method('currentBigBlind')
+            ->willReturn(new Chip(100));
+
+        // When
+        $p->turn();
+        $p->raise($table, $raiseChips);
+    }
+
+    /** @test */
+    public function allIn__calls_raise_with_all_users_chips(): void
+    {
+        // Given
+        $p = new Player();
+        $p->addChips(new Chip(1000));
+
+        $expectedPlayerChips = new Chip(0);
+        $expectedStatus      = false;
+        $raiseChips          = new Chip(1000);
+
+        $table = $this->createMock(Table::class);
+
+        $table
+            ->expects($this->once())
+            ->method('putChips')
+            ->with($raiseChips);
+
+        // When
+        $p->turn();
+        $p->allIn($table);
+
+        // Then
+        $this->assertSame($expectedStatus, $p->hasTurn());
+        $this->assertEquals($expectedPlayerChips, $p->chips());
     }
 }

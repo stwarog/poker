@@ -29,6 +29,6 @@ class StartTournamentService
     {
         $deck = $this->factory->create();
         $this->shuffleCardsService->shuffle($deck);
-        $tournament->start(Table::create($deck, $tournament->getRules()));
+        $tournament->start(Table::create($deck, $tournament));
     }
 }
