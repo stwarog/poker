@@ -4,13 +4,8 @@
 namespace App\Tests\Integration\Game\Tournament;
 
 
-use App\Game\Shared\Domain\Cards\CardCollection;
-use App\Game\Shared\Domain\Table;
 use App\Game\Tournament\Application\TournamentFacade;
-use App\Game\Tournament\Domain\Rules;
-use App\Game\Tournament\Domain\Tournament;
 use App\Tests\Integration\IntegrationTest;
-use Doctrine\ORM\EntityManagerInterface;
 
 class TournamentFacadeTest extends IntegrationTest
 {
@@ -20,22 +15,23 @@ class TournamentFacadeTest extends IntegrationTest
     public function signUp(): void
     {
         // Given
-        $exceptedCount = 1;
-        $tournament    = $this->facade->create(2, 4, 4000, 25, 50, true);
+        $tournament = $this->facade->create(2, 4, 4000, 25, 50, true);
 
         // When
         $this->facade->signUp($tournament);
 
         // Then
-        $this->assertEquals($exceptedCount, $this->getDbCount('tournament_participants'));
+        $this->assertEquals(1, $this->getDbCount('tournament_participants'));
+        $this->assertEquals(0, $this->getDbCount('tournament_players'));
+        $this->assertEquals(1, $this->getDbCount('tournament'));
+        $this->assertEquals(0, $this->getDbCount('game_table'));
     }
 
     /** @test */
     public function join(): void
     {
         // Given
-        $exceptedCount = 2;
-        $tournament    = $this->facade->create(2, 4, 4000, 25, 50, true);
+        $tournament = $this->facade->create(2, 4, 4000, 25, 50, true);
 
         // When
         $player1 = $this->facade->signUp($tournament);
@@ -44,8 +40,10 @@ class TournamentFacadeTest extends IntegrationTest
         $this->facade->join($tournament, $player2);
 
         // Then
-        $this->assertEquals($exceptedCount, $this->getDbCount('tournament_participants'));
-        $this->assertEquals($exceptedCount, $this->getDbCount('tournament_players'));
+        $this->assertEquals(2, $this->getDbCount('tournament_participants'));
+        $this->assertEquals(2, $this->getDbCount('tournament_players'));
+        $this->assertEquals(1, $this->getDbCount('tournament'));
+        $this->assertEquals(0, $this->getDbCount('game_table'));
     }
 
     /** @test */
@@ -68,8 +66,11 @@ class TournamentFacadeTest extends IntegrationTest
         foreach ($t->getPlayers() as $player) {
             $this->assertSame($exceptedCardCountPerPlayer, $player->getCards()->count());
         }
-//        $this->assertEquals($exceptedCount, $this->getDbCount('tournament_participants'));
-//        $this->assertEquals($exceptedCount, $this->getDbCount('tournament_players'));
+
+        $this->assertEquals(2, $this->getDbCount('tournament_participants'));
+        $this->assertEquals(2, $this->getDbCount('tournament_players'));
+        $this->assertEquals(1, $this->getDbCount('tournament'));
+        $this->assertEquals(1, $this->getDbCount('game_table'));
     }
 
     protected function setUp(): void
