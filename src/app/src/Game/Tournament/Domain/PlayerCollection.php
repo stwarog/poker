@@ -90,6 +90,11 @@ class PlayerCollection implements PlayerCollectionInterface
         return $this->elements;
     }
 
+    /**
+     * @param IteratorAggregate $iterable
+     *
+     * @return static
+     */
     public static function fromCollection(IteratorAggregate $iterable): PlayerCollectionInterface
     {
         $new = new self();
@@ -99,5 +104,48 @@ class PlayerCollection implements PlayerCollectionInterface
         }
 
         return $new;
+    }
+
+    public function offsetExists($offset): bool
+    {
+        return isset($this->elements[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->elements[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->elements[$offset] = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->elements[$offset]);
+    }
+
+    /**
+     * Should returns only players that participate the current round
+     *
+     * @return int
+     */
+    public function getPlayersUnderGameCount(): int
+    {
+        $wantedDecisions = [PlayerDecision::WAITING, PlayerDecision::CALL, PlayerDecision::RAISE];
+        $wantedStatuses  = [PlayerStatus::ACTIVE];
+
+        $filtered = array_filter(
+            $this->elements,
+            function (Player $p) use ($wantedDecisions, $wantedStatuses) {
+                $status   = (string) $p->getStatus();
+                $decision = (string) $p->getDecision();
+
+                return in_array($status, $wantedStatuses) && in_array($decision, $wantedDecisions);
+            }
+        );
+
+        return count($filtered);
     }
 }

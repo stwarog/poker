@@ -4,11 +4,12 @@
 namespace App\Game\Tournament\Domain;
 
 
+use ArrayAccess;
 use Countable;
 use Iterator;
 use IteratorAggregate;
 
-interface PlayerCollectionInterface extends Iterator, Countable
+interface PlayerCollectionInterface extends Iterator, Countable, ArrayAccess
 {
     public function getPlayer(PlayerId $player): ?Player;
 
@@ -26,4 +27,6 @@ interface PlayerCollectionInterface extends Iterator, Countable
     public function toArray(): array;
 
     public static function fromCollection(IteratorAggregate $iterable): self;
+
+    public function getPlayersUnderGameCount(): int;
 }

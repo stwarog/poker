@@ -78,13 +78,13 @@ class TournamentFacadeTest extends IntegrationTest
     protected function setUp(): void
     {
         parent::setUp();
-//        $this->connection->beginTransaction();
+        $this->connection->beginTransaction();
         $this->facade = $this->c->get(TournamentFacade::class);
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-//        $this->connection->commit();
+        $this->connection->commit();
     }
 }

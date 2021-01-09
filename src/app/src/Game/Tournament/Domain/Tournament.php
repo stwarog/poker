@@ -156,6 +156,18 @@ class Tournament
 
         $this->table = $table;
 
+        $this->flop($table);
+    }
+
+    /**
+     * @param Table $table
+     *
+     * @throws Exception
+     */
+    private function flop(Table $table): void
+    {
+        $this->verifyIsStarted();
+
         $players = $this->getPlayers();
 
         $players[0]->giveSmallBlind($table);
@@ -175,12 +187,9 @@ class Tournament
         return $this->status === TournamentStatus::READY;
     }
 
-    /**
-     * @return Player[]
-     */
-    public function getPlayers(): array
+    public function getPlayers(): PlayerCollection
     {
-        return array_values($this->players->toArray());
+        return PlayerCollection::fromCollection($this->players);
     }
 
     public function leave(PlayerId $player): void
@@ -270,7 +279,7 @@ class Tournament
         return $this->players->get($playerId->toString());
     }
 
-    private function verifyIsStarted(): bool
+    private function verifyIsStarted(): void
     {
         if ($this->status !== TournamentStatus::STARTED) {
             throw new RuntimeException('Tournament must be started to perform this action');

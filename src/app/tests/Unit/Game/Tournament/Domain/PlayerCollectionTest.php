@@ -6,6 +6,8 @@ namespace App\Tests\Unit\Game\Tournament\Domain;
 
 use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerCollection;
+use App\Game\Tournament\Domain\PlayerDecision;
+use App\Game\Tournament\Domain\PlayerStatus;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 
@@ -142,5 +144,46 @@ class PlayerCollectionTest extends TestCase
 
         // Then
         $this->assertSame($expectedKeys, $actual);
+    }
+
+    /**
+     * @test
+     * @dataProvider getPlayersUnderGameCountDataProvider
+     *
+     * @param PlayerStatus   $status
+     * @param PlayerDecision $decision
+     */
+    public function getPlayersUnderGameCount(PlayerDecision $decision, PlayerStatus $status): void
+    {
+        // Given
+        $c = new PlayerCollection();
+        $p = $this->createMock(Player::class);
+        $p->method('getStatus')->willReturn($status);
+        $p->method('getDecision')->willReturn($decision);
+        $c->addPlayer($p);
+
+        // When
+        $actual = $c->getPlayersUnderGameCount();
+
+        // Then
+        $this->assertSame(1, $actual);
+    }
+
+    public function getPlayersUnderGameCountDataProvider(): array
+    {
+        return [
+            'WAITING decision and active status' => [
+                PlayerDecision::WAITING(),
+                PlayerStatus::ACTIVE(),
+            ],
+            'CALL decision and active status'    => [
+                PlayerDecision::CALL(),
+                PlayerStatus::ACTIVE(),
+            ],
+            'RAISE decision and active status'   => [
+                PlayerDecision::RAISE(),
+                PlayerStatus::ACTIVE(),
+            ],
+        ];
     }
 }

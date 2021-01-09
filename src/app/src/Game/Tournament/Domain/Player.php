@@ -19,6 +19,7 @@ class Player
     private string $role = PlayerRole::NONE;
     private bool $hasTurn = false;
     private int $currentBet = 0;
+    private string $decision = PlayerDecision::WAITING;
 
     public function __construct(?PlayerId $uuid = null)
     {
@@ -201,5 +202,10 @@ class Player
     public function getCurrentBet(): Chip
     {
         return new Chip($this->currentBet);
+    }
+
+    public function getDecision(): PlayerDecision
+    {
+        return new PlayerDecision($this->decision);
     }
 }
