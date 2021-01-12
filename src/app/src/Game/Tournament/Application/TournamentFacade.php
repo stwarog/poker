@@ -19,12 +19,14 @@ final class TournamentFacade
     private JoinTournamentService $joinTournamentService;
     private StartTournamentService $startTournamentService;
     private TournamentByIdInterface $repository;
+    private TournamentDecisionService $decisionService;
 
     public function __construct(
         CreateTournamentService $createTournamentService,
         JoinTournamentService $joinTournamentService,
         TournamentSignUp $tournamentSignUpService,
         TournamentByIdInterface $repository,
+        TournamentDecisionService $decisionService,
         StartTournamentService $startTournamentService
     ) {
         $this->createTournamentService = $createTournamentService;
@@ -32,6 +34,7 @@ final class TournamentFacade
         $this->joinTournamentService   = $joinTournamentService;
         $this->startTournamentService  = $startTournamentService;
         $this->repository              = $repository;
+        $this->decisionService         = $decisionService;
     }
 
     public function create(
@@ -91,6 +94,64 @@ final class TournamentFacade
     {
         $this->startTournamentService->start(
             TournamentId::fromString($tournamentId)
+        );
+    }
+
+    /**
+     * @param string $tournamentId
+     * @param string $playerId
+     *
+     * @throws Exception
+     */
+    public function fold(string $tournamentId, string $playerId): void
+    {
+        $this->decisionService->fold(
+            TournamentId::fromString($tournamentId),
+            PlayerId::fromString($playerId),
+        );
+    }
+
+    /**
+     * @param string $tournamentId
+     * @param string $playerId
+     *
+     * @throws Exception
+     */
+    public function call(string $tournamentId, string $playerId): void
+    {
+        $this->decisionService->call(
+            TournamentId::fromString($tournamentId),
+            PlayerId::fromString($playerId),
+        );
+    }
+
+    /**
+     * @param string $tournamentId
+     * @param string $playerId
+     *
+     * @throws Exception
+     */
+    public function allIn(string $tournamentId, string $playerId): void
+    {
+        $this->decisionService->allIn(
+            TournamentId::fromString($tournamentId),
+            PlayerId::fromString($playerId),
+        );
+    }
+
+    /**
+     * @param string $tournamentId
+     * @param string $playerId
+     * @param int    $amount
+     *
+     * @throws Exception
+     */
+    public function raise(string $tournamentId, string $playerId, int $amount): void
+    {
+        $this->decisionService->raise(
+            TournamentId::fromString($tournamentId),
+            PlayerId::fromString($playerId),
+            new Chip($amount)
         );
     }
 
