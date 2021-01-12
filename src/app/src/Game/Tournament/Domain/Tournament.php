@@ -157,6 +157,12 @@ class Tournament extends AggregateRoot
 
         $this->table = $table;
 
+        foreach ($this->participants as $p) {
+            if ($this->players->contains($p) === false) {
+                $p->notJoined();
+            }
+        }
+
         $this->flop($table);
     }
 
@@ -188,9 +194,20 @@ class Tournament extends AggregateRoot
         return $this->status === TournamentStatus::READY;
     }
 
+    /**
+     * @return PlayerCollection|Player[]
+     */
     public function getPlayers(): PlayerCollection
     {
         return PlayerCollection::fromCollection($this->players);
+    }
+
+    /**
+     * @return Player[]|Collection
+     */
+    public function getParticipants()
+    {
+        return PlayerCollection::fromCollection($this->participants);
     }
 
     public function leave(PlayerId $player): void
