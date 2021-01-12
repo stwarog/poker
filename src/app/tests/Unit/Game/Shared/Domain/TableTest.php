@@ -164,7 +164,10 @@ class TableTest extends TestCase
         $expectedRound = 2;
         $table         = Table::create($this->deck, $tournament);
 
+        // When
         $table->nextPlayer();
+
+        // Then
         $actualRound = $table->getRound();
 
         $this->assertSame($expectedRound, $actualRound);
