@@ -5,13 +5,14 @@ namespace App\Game\Tournament\Domain;
 
 use App\Game\Chip;
 use App\Game\Shared\Domain\Table;
+use App\Shared\Common\AggregateRoot;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 
-class Tournament
+class Tournament extends AggregateRoot
 {
     private string $id;
     private string $status;
