@@ -8,8 +8,10 @@ use App\Game\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Cards\CardDeckFactory;
 use App\Game\Shared\Domain\Table;
+use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerCount;
 use App\Game\Tournament\Domain\PlayerId;
+use App\Game\Tournament\Domain\PlayerStatus;
 use App\Game\Tournament\Domain\Rules;
 use App\Game\Tournament\Domain\Tournament;
 use App\Game\Tournament\Domain\TournamentStatus;
@@ -439,6 +441,37 @@ class TournamentTest extends TestCase
         // Then
         $this->assertSame($expectedDeckCountAfterFlop, $table->deck()->count());
         $this->assertEquals($expectedFlopCount, $table->cards()->count());
+    }
+
+    /** @test */
+    public function start__has_not_joined_players__marks_them_as_not_joined(): void
+    {
+        // Given
+        $expectedNotJoinedPlayers = 1;
+
+        $t = Tournament::create();
+        $t->publish();
+
+        $p1 = $t->signUp();
+        $p2 = $t->signUp();
+        $t->signUp();
+        $t->join($p1);
+        $t->join($p2);
+
+        $table = Table::create($this->deck, $t);
+
+        // When
+        $t->start($table);
+
+        // Then
+        $actualNotJoined = 0;
+        /** @var Player $p */
+        foreach ($t->getParticipants() as $p) {
+            if ($p->getStatus()->equals(PlayerStatus::NOT_JOINED())) {
+                $actualNotJoined++;
+            }
+        }
+        $this->assertSame($expectedNotJoinedPlayers, $actualNotJoined);
     }
 
     /** @test */

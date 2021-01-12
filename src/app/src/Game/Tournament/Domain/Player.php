@@ -74,6 +74,7 @@ class Player
         $amount      = $table->currentSmallBlind();
         $this->chips = $this->chips()->take($amount)->getValue();
         $table->putChips($amount);
+        $this->currentBet = $amount->getValue();
     }
 
     public function chips(): Chip
@@ -90,6 +91,7 @@ class Player
         $amount      = $table->currentBigBlind();
         $this->chips = $this->chips()->take($amount)->getValue();
         $table->putChips($amount);
+        $this->currentBet = $amount->getValue();
     }
 
     /**
@@ -207,5 +209,10 @@ class Player
     public function getDecision(): PlayerDecision
     {
         return new PlayerDecision($this->decision);
+    }
+
+    public function notJoined(): void
+    {
+        $this->status = PlayerStatus::NOT_JOINED;
     }
 }
