@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Shared\Common;
+namespace App\Shared\Domain;
 
 
 abstract class AbstractId

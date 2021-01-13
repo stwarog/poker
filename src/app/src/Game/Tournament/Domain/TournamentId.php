@@ -4,7 +4,7 @@
 namespace App\Game\Tournament\Domain;
 
 
-use App\Shared\Common\AbstractId;
+use App\Shared\Domain\AbstractId;
 
 /**
  * @codeCoverageIgnore

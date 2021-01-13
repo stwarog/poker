@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\Common;
+namespace App\Shared\Domain;
 
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid as RamseyUuid;
