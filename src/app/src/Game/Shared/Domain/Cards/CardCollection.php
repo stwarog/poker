@@ -91,4 +91,12 @@ class CardCollection implements CardCollectionInterface, Iterator
             $this->elements[] = $card;
         }
     }
+
+    /**
+     * @return array|Card[]
+     */
+    public function toArray(): array
+    {
+        return $this->elements;
+    }
 }

@@ -157,4 +157,9 @@ class Table
 
         return isset($players[$index]) ? $players[$index] : $players[0];
     }
+
+    public function getId(): TableId
+    {
+        return TableId::fromString($this->id);
+    }
 }
