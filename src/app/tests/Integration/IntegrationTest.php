@@ -25,15 +25,15 @@ abstract class IntegrationTest extends KernelTestCase
         $this->connection = $connection;
     }
 
-    protected function q(): QueryBuilder
-    {
-        return $this->connection->createQueryBuilder();
-    }
-
     protected function getDbCount(string $table): int
     {
         $q = $this->q()->select('COUNT(*)')->from($table);
 
         return (int) $q->execute()->fetchOne();
+    }
+
+    protected function q(): QueryBuilder
+    {
+        return $this->connection->createQueryBuilder();
     }
 }

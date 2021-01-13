@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Tests\Unit\Game\Tournament\Domain;
+namespace Unit\Game\Tournament\Domain;
 
 
-use App\Game\Tournament\Domain\Player;
-use App\Game\Tournament\Domain\PlayerCollection;
-use App\Game\Tournament\Domain\PlayerDecision;
-use App\Game\Tournament\Domain\PlayerStatus;
+use App\Game\Table\Domain\Player;
+use App\Game\Table\Domain\PlayerCollection;
+use App\Game\Table\Domain\PlayerDecision;
+use App\Game\Table\Domain\PlayerStatus;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 

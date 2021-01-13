@@ -32,18 +32,6 @@ class TableView
         $this->player     = $player;
     }
 
-    public function toArray(): array
-    {
-        return [
-            'round'       => $this->round,
-            'cards'       => array_map(fn(Card $card) => (string) $card, $this->cards->toArray()),
-            'chips'       => $this->chips,
-            'small_blind' => $this->smallBlind,
-            'big_blind'   => $this->bigBlind,
-            'player_id'   => $this->player,
-        ];
-    }
-
     public static function fromArray(array $array): self
     {
         return new self(
@@ -54,5 +42,17 @@ class TableView
             (int) $array['big_blind'],
             $array['player_id'],
         );
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'round'       => $this->round,
+            'cards'       => array_map(fn(Card $card) => (string) $card, $this->cards->toArray()),
+            'chips'       => $this->chips,
+            'small_blind' => $this->smallBlind,
+            'big_blind'   => $this->bigBlind,
+            'player_id'   => $this->player,
+        ];
     }
 }

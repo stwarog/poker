@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Tests\Unit\Game\Tournament\Domain;
+namespace Unit\Game\Tournament\Domain;
 
 
-use App\Game\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
-use App\Game\Shared\Domain\Table;
-use App\Game\Tournament\Domain\Player;
-use App\Game\Tournament\Domain\PlayerStatus;
+use App\Game\Shared\Domain\Chip;
+use App\Game\Table\Domain\Player;
+use App\Game\Table\Domain\PlayerStatus;
+use App\Game\Table\Domain\Table;
 use App\Game\Tournament\Domain\Tournament;
 use Exception;
 use InvalidArgumentException;
@@ -19,13 +19,6 @@ class PlayerTest extends TestCase
 {
     private Tournament $tournament;
     private Table $table;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->tournament = Tournament::create();
-        $this->table      = Table::create(new CardCollection(), $this->tournament);
-    }
 
     /** @test */
     public function player__new__has_no_chips(): void
@@ -468,5 +461,12 @@ class PlayerTest extends TestCase
         // Then
         $this->assertSame($expectedStatus, $p->hasTurn());
         $this->assertEquals($expectedPlayerChips, $p->chips());
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->tournament = Tournament::create();
+        $this->table      = Table::create(new CardCollection(), $this->tournament);
     }
 }

@@ -6,7 +6,6 @@ namespace App\Game\Tournament\UI;
 
 use App\Game\Tournament\Application\ClientComponentInterface;
 use App\Game\Tournament\Application\TournamentFacade;
-use App\Game\Tournament\Infrastructure\ClientSocketHandler;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
@@ -22,7 +21,7 @@ class SocketServerCommand extends Command
 
     public function __construct(string $name = null, TournamentFacade $facade, ClientComponentInterface $clientComponent)
     {
-        $this->facade = $facade;
+        $this->facade          = $facade;
         $this->clientComponent = $clientComponent;
         parent::__construct($name);
     }

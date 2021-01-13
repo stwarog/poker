@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Tests\Unit\Game;
+namespace Unit\Game;
 
 
-use App\Game\Chip;
+use App\Game\Shared\Domain\Chip;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

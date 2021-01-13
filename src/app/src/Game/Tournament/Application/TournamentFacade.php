@@ -4,12 +4,13 @@
 namespace App\Game\Tournament\Application;
 
 
-use App\Game\Chip;
+use App\Game\Shared\Domain\Chip;
+use App\Game\Table\Domain\PlayerId;
 use App\Game\Tournament\Domain\PlayerCount;
-use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Tournament;
 use App\Game\Tournament\Domain\TournamentByIdInterface;
 use App\Game\Tournament\Domain\TournamentId;
+use App\Shared\Domain\Minutes;
 use Exception;
 
 final class TournamentFacade
@@ -46,6 +47,7 @@ final class TournamentFacade
         int $initialChipsPerPlayer,
         int $initialSmallBlind,
         int $initialBigBlind,
+        int $blindsChangeInterval = 2,
         bool $publish = false
     ): string {
         $t = $this->createTournamentService->create(
@@ -53,6 +55,7 @@ final class TournamentFacade
             new Chip($initialChipsPerPlayer),
             new Chip($initialSmallBlind),
             new Chip($initialBigBlind),
+            new Minutes($blindsChangeInterval),
             $publish
         );
 

@@ -4,10 +4,10 @@
 namespace App\Game\Tournament\Infrastructure;
 
 
-use App\Game\Tournament\Domain\Player;
-use App\Game\Tournament\Domain\PlayerByIdInterface;
-use App\Game\Tournament\Domain\PlayerId;
-use App\Game\Tournament\Domain\PlayerRepositoryInterface;
+use App\Game\Table\Domain\Player;
+use App\Game\Table\Domain\PlayerByIdInterface;
+use App\Game\Table\Domain\PlayerId;
+use App\Game\Table\Domain\PlayerRepositoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 class DbPlayerRepository implements PlayerByIdInterface, PlayerRepositoryInterface

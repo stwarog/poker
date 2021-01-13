@@ -6,8 +6,9 @@ namespace App\Game\Tournament\Application;
 
 use Exception;
 use Ratchet\ConnectionInterface;
+use Ratchet\MessageComponentInterface;
 
-interface ClientComponentInterface extends \Ratchet\MessageComponentInterface
+interface ClientComponentInterface extends MessageComponentInterface
 {
     public function onOpen(ConnectionInterface $conn): void;
 

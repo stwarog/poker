@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Tests\Integration\Game\Tournament;
+namespace Integration\Game\Tournament;
 
 
 use App\Game\Tournament\Application\TournamentFacade;
@@ -12,10 +12,21 @@ class TournamentFacadeTest extends IntegrationTest
     private TournamentFacade $facade;
 
     /** @test */
+    public function create(): void
+    {
+        // Given & When
+        $this->facade->create(2, 4, 2000, 25, 50, 2);
+
+        // Then
+        $this->assertEquals(1, $this->getDbCount('tournament'));
+        $this->assertEquals(0, $this->getDbCount('game_table'));
+    }
+
+    /** @test */
     public function signUp(): void
     {
         // Given
-        $tournament = $this->facade->create(2, 4, 4000, 25, 50, true);
+        $tournament = $this->facade->create(2, 4, 2000, 25, 50, 2);
 
         // When
         $this->facade->signUp($tournament);
@@ -69,10 +80,19 @@ class TournamentFacadeTest extends IntegrationTest
             $this->assertSame($exceptedCardCountPerPlayer, $player->getCards()->count());
         }
 
-        $this->assertEquals(3, $this->getDbCount('tournament_participants'));
-        $this->assertEquals(3, $this->getDbCount('tournament_players'));
-        $this->assertEquals(1, $this->getDbCount('tournament'));
+//        $this->assertEquals(3, $this->getDbCount('tournament_participants'));
+//        $this->assertEquals(3, $this->getDbCount('tournament_players'));
+        $this->assertEquals(2, $this->getDbCount('tournament'));
         $this->assertEquals(1, $this->getDbCount('game_table'));
+    }
+
+    /** @test */
+    public function publish(): void
+    {
+//        $tournament = $this->facade->create(2, 4, 4000, 25, 50, true);
+        $tournament = $this->facade->start('d1e02b1b-c981-450f-9b9a-f58fd4747246');
+//        $factory = new CardDeckFactory();
+//        $tournament->start(Table::create($factory->create(), $tournament));
     }
 
     protected function setUp(): void

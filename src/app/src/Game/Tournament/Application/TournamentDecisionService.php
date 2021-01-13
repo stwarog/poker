@@ -3,9 +3,9 @@
 namespace App\Game\Tournament\Application;
 
 
-use App\Game\Chip;
-use App\Game\Tournament\Domain\PlayerByIdInterface;
-use App\Game\Tournament\Domain\PlayerId;
+use App\Game\Shared\Domain\Chip;
+use App\Game\Table\Domain\PlayerByIdInterface;
+use App\Game\Table\Domain\PlayerId;
 use App\Game\Tournament\Domain\TournamentByIdInterface;
 use App\Game\Tournament\Domain\TournamentId;
 use App\Game\Tournament\Domain\TournamentRepositoryInterface;
