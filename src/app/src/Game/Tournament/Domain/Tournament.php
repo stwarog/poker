@@ -5,13 +5,15 @@ namespace App\Game\Tournament\Domain;
 
 use App\Game\Chip;
 use App\Game\Shared\Domain\Table;
+use App\Game\Shared\Domain\TableId;
+use App\Shared\Common\AggregateRoot;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 
-class Tournament
+class Tournament extends AggregateRoot
 {
     private string $id;
     private string $status;
@@ -114,26 +116,34 @@ class Tournament
             throw new RuntimeException('Can not join this tournament because is not signed up');
         }
 
-        if ($this->hasPlayer($player)) {
-            throw new RuntimeException('Player already joined to this tournament');
+        if (false === $this->hasPlayer($player)) {
+            # throw new RuntimeException('Player already joined to this tournament');
+            $p = $this->getParticipate($player);
+            $this->players->set($p->getId()->toString(), $p);
         }
-
-        $p = $this->participants->get($player->toString());
-        $this->players->set($p->getId()->toString(), $p);
 
         if ($isReadyToStart = $this->getPlayersCount() >= $this->getRules()->getPlayerCount()->getMin()) {
             $this->status = TournamentStatus::READY;
         }
     }
 
+    private function getParticipate(PlayerId $participant): Player
+    {
+        return $this->participants->filter(fn(Player $p) => $p->getId()->equals($participant))->first();
+    }
+
     public function hasParticipant(PlayerId $participant): bool
     {
-        return $this->participants->containsKey($participant->toString());
+        return !$this->participants->filter(fn(Player $p) => $p->getId()->equals($participant))->isEmpty();
     }
 
     public function hasPlayer(PlayerId $player): bool
     {
-        return $this->players->containsKey($player->toString());
+        if ($this->players->isEmpty()) {
+            return false;
+        }
+
+        return false === $this->players->filter(fn(Player $p) => $p->getId()->equals($player))->isEmpty();
     }
 
     public function getPlayersCount(): int
@@ -155,6 +165,12 @@ class Tournament
         $this->status = TournamentStatus::STARTED;
 
         $this->table = $table;
+
+        foreach ($this->participants as $p) {
+            if ($this->players->contains($p) === false) {
+                $p->notJoined();
+            }
+        }
 
         $this->flop($table);
     }
@@ -187,9 +203,20 @@ class Tournament
         return $this->status === TournamentStatus::READY;
     }
 
+    /**
+     * @return PlayerCollection|Player[]
+     */
     public function getPlayers(): PlayerCollection
     {
         return PlayerCollection::fromCollection($this->players);
+    }
+
+    /**
+     * @return Player[]|Collection
+     */
+    public function getParticipants(): PlayerCollection
+    {
+        return PlayerCollection::fromCollection($this->participants);
     }
 
     public function leave(PlayerId $player): void
@@ -284,5 +311,14 @@ class Tournament
         if ($this->status !== TournamentStatus::STARTED) {
             throw new RuntimeException('Tournament must be started to perform this action');
         }
+    }
+
+    public function getTable(): ?TableId
+    {
+        if (empty($this->table)) {
+            return null;
+        }
+
+        return $this->table->getId();
     }
 }

@@ -93,7 +93,7 @@ class PlayerCollection implements PlayerCollectionInterface
     /**
      * @param IteratorAggregate $iterable
      *
-     * @return static
+     * @return static|Player[]
      */
     public static function fromCollection(IteratorAggregate $iterable): PlayerCollectionInterface
     {

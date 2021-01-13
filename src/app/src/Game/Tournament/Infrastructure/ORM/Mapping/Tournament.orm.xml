@@ -41,7 +41,7 @@
             </options>
         </field>
 
-        <many-to-many field="players" target-entity="Player">
+        <many-to-many field="players" target-entity="Player" fetch="EAGER">
             <cascade>
                 <cascade-all/>
             </cascade>
@@ -55,7 +55,7 @@
             </join-table>
         </many-to-many>
 
-        <many-to-many field="participants" target-entity="Player">
+        <many-to-many field="participants" target-entity="Player" fetch="EAGER">
             <cascade>
                 <cascade-all/>
             </cascade>
@@ -69,7 +69,7 @@
             </join-table>
         </many-to-many>
 
-        <many-to-one field="table" target-entity="App\Game\Shared\Domain\Table">
+        <many-to-one field="table" target-entity="App\Game\Shared\Domain\Table" fetch="EAGER">
             <cascade>
                 <cascade-persist/>
             </cascade>

@@ -87,8 +87,12 @@ class Table
         return new Chip($this->chips);
     }
 
-    public function getCurrentPlayer(): PlayerId
+    public function getCurrentPlayer(): ?PlayerId
     {
+        if (empty($this->player)) {
+            return null;
+        }
+
         return PlayerId::fromString($this->player);
     }
 
@@ -99,8 +103,32 @@ class Table
      */
     public function setCurrentPlayer(Player $nextPlayer)
     {
+        if ($hasCurrentPlayer = !empty($this->getCurrentPlayer()) && $this->getCurrentPlayer()->equals($nextPlayer->getId())) {
+            throw new Exception('Attempted to set the same current player');
+        }
         $nextPlayer->turn();
         $this->player = $nextPlayer->getId()->toString();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function nextPlayer(): void
+    {
+        $next = $this->getNextPlayer($this->tournament->getPlayers());
+
+        if ($this->tournament->getPlayers()->getPlayersUnderGameCount() === 1) {
+            $this->nextRound();
+
+            return;
+        }
+
+        $this->setCurrentPlayer($next);
+    }
+
+    private function nextRound()
+    {
+        $this->round++;
     }
 
     public function putChips(Chip $amount): void
@@ -113,21 +141,12 @@ class Table
         return $this->deck;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function nextPlayer(): void
-    {
-        $current = $this->getNextPlayer($this->tournament->getPlayers());
-        $this->setCurrentPlayer($current);
-    }
-
     public function getCurrentBet(): Chip
     {
         return new Chip($this->currentBet);
     }
 
-    public function getNextPlayer(PlayerCollection $players): Player
+    public function getNextPlayer(PlayerCollection $players): ?Player
     {
         $hasBigBlind = array_filter($players->toArray(), fn(Player $p) => $p->hasBigBlind());
         if (empty($hasBigBlind)) {
@@ -137,5 +156,10 @@ class Table
         $index++;
 
         return isset($players[$index]) ? $players[$index] : $players[0];
+    }
+
+    public function getId(): TableId
+    {
+        return TableId::fromString($this->id);
     }
 }
