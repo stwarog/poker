@@ -4,7 +4,7 @@
 namespace App\Game\Tournament\Domain;
 
 
-use App\Game\Chip;
+use App\Game\Shared\Domain\Chip;
 
 class Rules
 {

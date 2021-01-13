@@ -3,8 +3,8 @@
 namespace App\Game\Tournament\Domain;
 
 
-use App\Game\Chip;
-use App\Game\Shared\Domain\Table;
+use App\Game\Shared\Domain\Chip;
+use App\Game\Table\Domain\Table;
 use App\Game\Shared\Domain\TableId;
 use App\Shared\Common\AggregateRoot;
 use Doctrine\Common\Collections\ArrayCollection;

@@ -4,6 +4,8 @@
 namespace App\Tests\Integration\Game\Tournament;
 
 
+use App\Game\Shared\Domain\Cards\CardDeckFactory;
+use App\Game\Table\Domain\Table;
 use App\Game\Tournament\Application\TournamentFacade;
 use App\Tests\Integration\IntegrationTest;
 

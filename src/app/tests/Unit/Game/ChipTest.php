@@ -4,7 +4,7 @@
 namespace App\Tests\Unit\Game;
 
 
-use App\Game\Chip;
+use App\Game\Shared\Domain\Chip;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

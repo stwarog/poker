@@ -4,9 +4,9 @@
 namespace App\Tests\Unit\Game\Tournament\Domain;
 
 
-use App\Game\Chip;
+use App\Game\Shared\Domain\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
-use App\Game\Shared\Domain\Table;
+use App\Game\Table\Domain\Table;
 use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerStatus;
 use App\Game\Tournament\Domain\Tournament;

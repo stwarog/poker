@@ -4,7 +4,7 @@
 namespace App\Game\Tournament\Application;
 
 
-use App\Game\Chip;
+use App\Game\Shared\Domain\Chip;
 use App\Game\Tournament\Domain\PlayerCount;
 use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Tournament;

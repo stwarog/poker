@@ -7,7 +7,7 @@ namespace App\Unit\Game\Tournament\Domain;
 use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Cards\CardFactoryInterface;
 use App\Game\Shared\Domain\Cards\ShuffleCardsServiceInterface;
-use App\Game\Shared\Domain\Table;
+use App\Game\Table\Domain\Table;
 use App\Game\Tournament\Domain\StartTournamentService;
 use App\Game\Tournament\Domain\Tournament;
 use PHPUnit\Framework\TestCase;

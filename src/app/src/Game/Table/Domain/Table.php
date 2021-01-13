@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Game\Shared\Domain;
+namespace App\Game\Table\Domain;
 
 
-use App\Game\Chip;
+use App\Game\Shared\Domain\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
+use App\Game\Shared\Domain\TableId;
 use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerCollection;
 use App\Game\Tournament\Domain\PlayerId;

@@ -6,7 +6,7 @@ namespace App\Game\Tournament\Domain;
 
 use App\Game\Shared\Domain\Cards\CardFactoryInterface;
 use App\Game\Shared\Domain\Cards\ShuffleCardsServiceInterface;
-use App\Game\Shared\Domain\Table;
+use App\Game\Table\Domain\Table;
 use Exception;
 
 class StartTournamentService

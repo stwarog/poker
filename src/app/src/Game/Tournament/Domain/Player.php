@@ -2,9 +2,9 @@
 
 namespace App\Game\Tournament\Domain;
 
-use App\Game\Chip;
+use App\Game\Shared\Domain\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
-use App\Game\Shared\Domain\Table;
+use App\Game\Table\Domain\Table;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
