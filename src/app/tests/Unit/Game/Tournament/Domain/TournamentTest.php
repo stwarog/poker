@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Tests\Unit\Game\Tournament\Domain;
+namespace Unit\Game\Tournament\Domain;
 
 
 use App\Game\Shared\Domain\Chip;

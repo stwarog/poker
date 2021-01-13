@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Tests\Integration\Game\Tournament;
+namespace Integration\Game\Tournament;
 
 
 use App\Game\Shared\Domain\Cards\CardDeckFactory;
