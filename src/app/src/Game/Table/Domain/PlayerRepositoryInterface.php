@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Game\Tournament\Domain;
+namespace App\Game\Table\Domain;
 
 
 interface PlayerRepositoryInterface

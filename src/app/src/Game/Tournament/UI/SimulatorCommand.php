@@ -34,39 +34,44 @@ class SimulatorCommand extends Command
         $output->writeln('Hello, lets play the game!');
 
         $t = $this->facade->create(
-            3, 5, 1000, 25, 50, true
+            3,
+            5,
+            1000,
+            25,
+            50,
+            true
         );
         $output->writeln(sprintf('Crated tournament: %s', $t));
         $output->writeln('');
 
-        $helper = $this->getHelper('question');
+        $helper   = $this->getHelper('question');
         $question = new Question('How many users to sign up? ', '2');
         $output->writeln('');
 
         $players = [];
 
-        $signUps = (int)$helper->ask($input, $output, $question);
-        for ($c=0; $c !== $signUps; $c++) {
-            $index = $c + 1;
-            $id = $this->facade->signUp($t);
+        $signUps = (int) $helper->ask($input, $output, $question);
+        for ($c = 0; $c !== $signUps; $c++) {
+            $index           = $c + 1;
+            $id              = $this->facade->signUp($t);
             $players[$index] = $id;
             $output->writeln(sprintf('Sign up player: %s with no: %d', $id, $index));
         }
 
         $output->writeln('');
 
-        $helper = $this->getHelper('question');
+        $helper   = $this->getHelper('question');
         $question = new Question('How many players to join? ', '2');
 
-        $join = (int)$helper->ask($input, $output, $question);
-        for ($c=0; $c !== $join; $c++) {
+        $join = (int) $helper->ask($input, $output, $question);
+        for ($c = 0; $c !== $join; $c++) {
             $index = $c + 1;
             $this->facade->join($t, $players[$index]);
             $output->writeln(sprintf('Joined player: %s', $players[$index]));
         }
 
         $question = new ConfirmationQuestion('Start tournament ?', true);
-        $join = (bool)$helper->ask($input, $output, $question);
+        $join     = (bool) $helper->ask($input, $output, $question);
 
         if (!$join) {
             return Command::SUCCESS;
@@ -76,8 +81,8 @@ class SimulatorCommand extends Command
 
         try {
             $question = new Question('Acting as? ', 1);
-            $id = (int)$helper->ask($input, $output, $question);
-            $p = $players[$id];
+            $id       = (int) $helper->ask($input, $output, $question);
+            $p        = $players[$id];
 
             $question = new ChoiceQuestion(
                 'What to do?',
@@ -91,9 +96,10 @@ class SimulatorCommand extends Command
 
             if ($decision === 'raise') {
                 $question = new Question('How much? (100) ', 100);
-                $amount = (int)$helper->ask($input, $output, $question);
+                $amount   = (int) $helper->ask($input, $output, $question);
                 $this->facade->raise($t, $p, $amount);
-                return Command::SUCCESS;;
+
+                return Command::SUCCESS;
             }
 
             $this->facade->$decision($t, $p);

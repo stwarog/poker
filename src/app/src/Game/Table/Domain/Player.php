@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace App\Game\Tournament\Domain;
+namespace App\Game\Table\Domain;
 
-use App\Game\Shared\Domain\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
-use App\Game\Table\Domain\Table;
+use App\Game\Shared\Domain\Chip;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;

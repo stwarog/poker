@@ -7,9 +7,9 @@ namespace Unit\Game\Table\Domain;
 use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Cards\CardDeckFactory;
 use App\Game\Shared\Domain\Chip;
+use App\Game\Table\Domain\Player;
+use App\Game\Table\Domain\PlayerCollection;
 use App\Game\Table\Domain\Table;
-use App\Game\Tournament\Domain\Player;
-use App\Game\Tournament\Domain\PlayerCollection;
 use App\Game\Tournament\Domain\Tournament;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -19,13 +19,6 @@ class TableTest extends TestCase
 {
     private CardCollection $deck;
     private Tournament $tournament;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->deck       = (new CardDeckFactory())->create();
-        $this->tournament = Tournament::create();
-    }
 
     /**
      * 1
@@ -170,5 +163,12 @@ class TableTest extends TestCase
         $actualRound = $table->getRound();
 
         $this->assertSame($expectedRound, $actualRound);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->deck       = (new CardDeckFactory())->create();
+        $this->tournament = Tournament::create();
     }
 }

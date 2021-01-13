@@ -4,14 +4,14 @@
 namespace Unit\Game\Tournament\Domain;
 
 
-use App\Game\Shared\Domain\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
 use App\Game\Shared\Domain\Cards\CardDeckFactory;
+use App\Game\Shared\Domain\Chip;
+use App\Game\Table\Domain\Player;
+use App\Game\Table\Domain\PlayerId;
+use App\Game\Table\Domain\PlayerStatus;
 use App\Game\Table\Domain\Table;
-use App\Game\Tournament\Domain\Player;
 use App\Game\Tournament\Domain\PlayerCount;
-use App\Game\Tournament\Domain\PlayerId;
-use App\Game\Tournament\Domain\PlayerStatus;
 use App\Game\Tournament\Domain\Rules;
 use App\Game\Tournament\Domain\Tournament;
 use App\Game\Tournament\Domain\TournamentStatus;
@@ -25,13 +25,6 @@ class TournamentTest extends TestCase
     private Table $table;
     private CardCollection $deck;
     private Tournament $tournament;
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->deck       = (new CardDeckFactory())->create();
-        $this->tournament = Tournament::create();
-        $this->table      = Table::create($this->deck, $this->tournament);
-    }
 
     /**
      * 0
@@ -621,5 +614,13 @@ class TournamentTest extends TestCase
         // When
         $t = Tournament::create();
         $t->allIn($player);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->deck       = (new CardDeckFactory())->create();
+        $this->tournament = Tournament::create();
+        $this->table      = Table::create($this->deck, $this->tournament);
     }
 }

@@ -4,8 +4,11 @@ namespace App\Game\Tournament\Domain;
 
 
 use App\Game\Shared\Domain\Chip;
-use App\Game\Table\Domain\Table;
 use App\Game\Shared\Domain\TableId;
+use App\Game\Table\Domain\Player;
+use App\Game\Table\Domain\PlayerCollection;
+use App\Game\Table\Domain\PlayerId;
+use App\Game\Table\Domain\Table;
 use App\Shared\Common\AggregateRoot;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -127,11 +130,6 @@ class Tournament extends AggregateRoot
         }
     }
 
-    private function getParticipate(PlayerId $participant): Player
-    {
-        return $this->participants->filter(fn(Player $p) => $p->getId()->equals($participant))->first();
-    }
-
     public function hasParticipant(PlayerId $participant): bool
     {
         return !$this->participants->filter(fn(Player $p) => $p->getId()->equals($participant))->isEmpty();
@@ -144,6 +142,11 @@ class Tournament extends AggregateRoot
         }
 
         return false === $this->players->filter(fn(Player $p) => $p->getId()->equals($player))->isEmpty();
+    }
+
+    private function getParticipate(PlayerId $participant): Player
+    {
+        return $this->participants->filter(fn(Player $p) => $p->getId()->equals($participant))->first();
     }
 
     public function getPlayersCount(): int
@@ -175,6 +178,11 @@ class Tournament extends AggregateRoot
         $this->flop($table);
     }
 
+    private function isReady(): bool
+    {
+        return $this->status === TournamentStatus::READY;
+    }
+
     /**
      * @param Table $table
      *
@@ -198,9 +206,11 @@ class Tournament extends AggregateRoot
         $table->revealCards(3);
     }
 
-    private function isReady(): bool
+    private function verifyIsStarted(): void
     {
-        return $this->status === TournamentStatus::READY;
+        if ($this->status !== TournamentStatus::STARTED) {
+            throw new RuntimeException('Tournament must be started to perform this action');
+        }
     }
 
     /**
@@ -264,6 +274,11 @@ class Tournament extends AggregateRoot
         $p->fold($this->table);
     }
 
+    private function getPlayer(PlayerId $playerId): Player
+    {
+        return $this->players->get($playerId->toString());
+    }
+
     /**
      * @param PlayerId $id
      *
@@ -299,18 +314,6 @@ class Tournament extends AggregateRoot
         $this->verifyIsStarted();
         $p = $this->getPlayer($id);
         $p->allIn($this->table);
-    }
-
-    private function getPlayer(PlayerId $playerId): Player
-    {
-        return $this->players->get($playerId->toString());
-    }
-
-    private function verifyIsStarted(): void
-    {
-        if ($this->status !== TournamentStatus::STARTED) {
-            throw new RuntimeException('Tournament must be started to perform this action');
-        }
     }
 
     public function getTable(): ?TableId

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Game\Tournament\Domain;
+namespace App\Game\Table\Domain;
 
 
 use App\Shared\Common\AbstractId;

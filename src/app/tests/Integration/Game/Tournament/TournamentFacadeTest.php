@@ -4,8 +4,6 @@
 namespace Integration\Game\Tournament;
 
 
-use App\Game\Shared\Domain\Cards\CardDeckFactory;
-use App\Game\Table\Domain\Table;
 use App\Game\Tournament\Application\TournamentFacade;
 use App\Tests\Integration\IntegrationTest;
 
@@ -77,16 +75,38 @@ class TournamentFacadeTest extends IntegrationTest
         $this->assertEquals(1, $this->getDbCount('game_table'));
     }
 
+    /** @test */
+    public function create(): void
+    {
+        $tournament = $this->facade->create(2, 4, 4000, 25, 50, true);
+
+        // When
+        $this->facade->signUp($tournament);
+        $this->facade->signUp($tournament);
+        $this->facade->signUp($tournament);
+        $this->facade->signUp($tournament);
+
+    }
+
+    /** @test */
+    public function publish(): void
+    {
+//        $tournament = $this->facade->create(2, 4, 4000, 25, 50, true);
+        $tournament = $this->facade->start('d1e02b1b-c981-450f-9b9a-f58fd4747246');
+//        $factory = new CardDeckFactory();
+//        $tournament->start(Table::create($factory->create(), $tournament));
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->connection->beginTransaction();
+//        $this->connection->beginTransaction();
         $this->facade = $this->c->get(TournamentFacade::class);
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-        $this->connection->commit();
+//        $this->connection->commit();
     }
 }

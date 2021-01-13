@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Game\Tournament\Domain;
+namespace App\Game\Table\Domain;
 
 
 use ArrayAccess;
@@ -11,6 +11,8 @@ use IteratorAggregate;
 
 interface PlayerCollectionInterface extends Iterator, Countable, ArrayAccess
 {
+    public static function fromCollection(IteratorAggregate $iterable): self;
+
     public function getPlayer(PlayerId $player): ?Player;
 
     public function count();
@@ -25,8 +27,6 @@ interface PlayerCollectionInterface extends Iterator, Countable, ArrayAccess
      * @return Player[]
      */
     public function toArray(): array;
-
-    public static function fromCollection(IteratorAggregate $iterable): self;
 
     public function getPlayersUnderGameCount(): int;
 }

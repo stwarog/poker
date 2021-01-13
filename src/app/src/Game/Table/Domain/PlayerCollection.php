@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace App\Game\Tournament\Domain;
+namespace App\Game\Table\Domain;
 
 
 use IteratorAggregate;
@@ -16,6 +16,37 @@ class PlayerCollection implements PlayerCollectionInterface
         $this->elements = $elements;
     }
 
+    /**
+     * @param IteratorAggregate $iterable
+     *
+     * @return static|Player[]
+     */
+    public static function fromCollection(IteratorAggregate $iterable): PlayerCollectionInterface
+    {
+        $new = new self();
+
+        foreach ($iterable as $player) {
+            $new->addPlayer($player);
+        }
+
+        return $new;
+    }
+
+    public function addPlayer(Player ...$players): void
+    {
+        foreach ($players as $player) {
+            if ($this->hasPlayer($player->getId())) {
+                continue;
+            }
+            $this->elements[] = $player;
+        }
+    }
+
+    public function hasPlayer(PlayerId $player): bool
+    {
+        return !empty(array_filter($this->elements, fn(Player $p) => $p->getId()->equals($player)));
+    }
+
     public function removePlayer(PlayerId $player): void
     {
         if (false === $this->hasPlayer($player)) {
@@ -28,11 +59,6 @@ class PlayerCollection implements PlayerCollectionInterface
     public function count(): int
     {
         return count($this->elements);
-    }
-
-    public function hasPlayer(PlayerId $player): bool
-    {
-        return !empty(array_filter($this->elements, fn(Player $p) => $p->getId()->equals($player)));
     }
 
     public function current()
@@ -65,16 +91,6 @@ class PlayerCollection implements PlayerCollectionInterface
         return empty($this->elements);
     }
 
-    public function addPlayer(Player ...$players): void
-    {
-        foreach ($players as $player) {
-            if ($this->hasPlayer($player->getId())) {
-                continue;
-            }
-            $this->elements[] = $player;
-        }
-    }
-
     public function getPlayer(PlayerId $player): ?Player
     {
         $filtered = array_filter($this->elements, fn(Player $p) => $p->getId()->equals($player));
@@ -88,22 +104,6 @@ class PlayerCollection implements PlayerCollectionInterface
     public function toArray(): array
     {
         return $this->elements;
-    }
-
-    /**
-     * @param IteratorAggregate $iterable
-     *
-     * @return static|Player[]
-     */
-    public static function fromCollection(IteratorAggregate $iterable): PlayerCollectionInterface
-    {
-        $new = new self();
-
-        foreach ($iterable as $player) {
-            $new->addPlayer($player);
-        }
-
-        return $new;
     }
 
     public function offsetExists($offset): bool

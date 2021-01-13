@@ -4,12 +4,9 @@
 namespace App\Game\Table\Domain;
 
 
-use App\Game\Shared\Domain\Chip;
 use App\Game\Shared\Domain\Cards\CardCollection;
+use App\Game\Shared\Domain\Chip;
 use App\Game\Shared\Domain\TableId;
-use App\Game\Tournament\Domain\Player;
-use App\Game\Tournament\Domain\PlayerCollection;
-use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Tournament;
 use Exception;
 use RuntimeException;
@@ -88,29 +85,6 @@ class Table
         return new Chip($this->chips);
     }
 
-    public function getCurrentPlayer(): ?PlayerId
-    {
-        if (empty($this->player)) {
-            return null;
-        }
-
-        return PlayerId::fromString($this->player);
-    }
-
-    /**
-     * @param Player $nextPlayer
-     *
-     * @throws Exception
-     */
-    public function setCurrentPlayer(Player $nextPlayer)
-    {
-        if ($hasCurrentPlayer = !empty($this->getCurrentPlayer()) && $this->getCurrentPlayer()->equals($nextPlayer->getId())) {
-            throw new Exception('Attempted to set the same current player');
-        }
-        $nextPlayer->turn();
-        $this->player = $nextPlayer->getId()->toString();
-    }
-
     /**
      * @throws Exception
      */
@@ -127,9 +101,44 @@ class Table
         $this->setCurrentPlayer($next);
     }
 
+    public function getNextPlayer(PlayerCollection $players): ?Player
+    {
+        $hasBigBlind = array_filter($players->toArray(), fn(Player $p) => $p->hasBigBlind());
+        if (empty($hasBigBlind)) {
+            throw new RuntimeException('Attempted to get next player, but no Big Blind assigned');
+        }
+        $index = array_key_first($hasBigBlind);
+        $index++;
+
+        return isset($players[$index]) ? $players[$index] : $players[0];
+    }
+
     private function nextRound()
     {
         $this->round++;
+    }
+
+    /**
+     * @param Player $nextPlayer
+     *
+     * @throws Exception
+     */
+    public function setCurrentPlayer(Player $nextPlayer)
+    {
+        if ($hasCurrentPlayer = !empty($this->getCurrentPlayer()) && $this->getCurrentPlayer()->equals($nextPlayer->getId())) {
+            throw new Exception('Attempted to set the same current player');
+        }
+        $nextPlayer->turn();
+        $this->player = $nextPlayer->getId()->toString();
+    }
+
+    public function getCurrentPlayer(): ?PlayerId
+    {
+        if (empty($this->player)) {
+            return null;
+        }
+
+        return PlayerId::fromString($this->player);
     }
 
     public function putChips(Chip $amount): void
@@ -145,18 +154,6 @@ class Table
     public function getCurrentBet(): Chip
     {
         return new Chip($this->currentBet);
-    }
-
-    public function getNextPlayer(PlayerCollection $players): ?Player
-    {
-        $hasBigBlind = array_filter($players->toArray(), fn(Player $p) => $p->hasBigBlind());
-        if (empty($hasBigBlind)) {
-            throw new RuntimeException('Attempted to get next player, but no Big Blind assigned');
-        }
-        $index = array_key_first($hasBigBlind);
-        $index++;
-
-        return isset($players[$index]) ? $players[$index] : $players[0];
     }
 
     public function getId(): TableId

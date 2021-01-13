@@ -5,8 +5,8 @@ namespace App\Game\Tournament\Application;
 
 
 use App\Game\Shared\Domain\Chip;
+use App\Game\Table\Domain\PlayerId;
 use App\Game\Tournament\Domain\PlayerCount;
-use App\Game\Tournament\Domain\PlayerId;
 use App\Game\Tournament\Domain\Tournament;
 use App\Game\Tournament\Domain\TournamentByIdInterface;
 use App\Game\Tournament\Domain\TournamentId;
