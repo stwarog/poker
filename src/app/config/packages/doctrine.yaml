@@ -10,21 +10,27 @@ doctrine:
     naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
     auto_mapping: true
     mappings:
-      App\Game\Tournament\Domain\Player:
+      App\Game\Table\Domain\Player:
+        is_bundle: false
+        type: xml
+        dir: '%kernel.project_dir%/src/Game/Table/Infrastructure/ORM/Mapping'
+        prefix: 'App\Game\Table\Domain'
+        alias: Game
+      App\Game\Tournament\Domain\Participant:
         is_bundle: false
         type: xml
         dir: '%kernel.project_dir%/src/Game/Tournament/Infrastructure/ORM/Mapping'
         prefix: 'App\Game\Tournament\Domain'
         alias: Game
-      App\Game\Tournament\Domain\Tournament:
+#      App\Game\Tournament\Domain\Tournament:
+#        is_bundle: false
+#        type: xml
+#        dir: '%kernel.project_dir%/src/Game/Tournament/Infrastructure/ORM/Mapping'
+#        prefix: 'App\Game\Tournament\Domain'
+#        alias: Game
+      App\Game\Table\Domain\Table:
         is_bundle: false
         type: xml
-        dir: '%kernel.project_dir%/src/Game/Tournament/Infrastructure/ORM/Mapping'
-        prefix: 'App\Game\Tournament\Domain'
-        alias: Game
-      App\Game\Shared\Domain\Table:
-        is_bundle: false
-        type: xml
-        dir: '%kernel.project_dir%/src/Game/Shared/Infrastructure/ORM/Mapping'
-        prefix: 'App\Game\Shared\Domain'
+        dir: '%kernel.project_dir%/src/Game/Table/Infrastructure/ORM/Mapping'
+        prefix: 'App\Game\Table\Domain'
         alias: Game

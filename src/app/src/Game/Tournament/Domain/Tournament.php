@@ -31,9 +31,9 @@ class Tournament extends AggregateRoot
     private int $initialChipsPerPlayer;
     private int $initialSmallBlind;
     private int $initialBigBlind;
-    private int $blindsChangeInterval = 2;
+    private int $blindsChangeInterval;
 
-    private ?string $table;
+    private ?string $table = null;
 
     /** @var Participant[]|Collection */
     private Collection $participants;

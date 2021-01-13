@@ -12,10 +12,21 @@ class TournamentFacadeTest extends IntegrationTest
     private TournamentFacade $facade;
 
     /** @test */
+    public function create(): void
+    {
+        // Given & When
+        $this->facade->create(2, 4, 2000, 25, 50, 2);
+
+        // Then
+        $this->assertEquals(1, $this->getDbCount('tournament'));
+        $this->assertEquals(0, $this->getDbCount('game_table'));
+    }
+
+    /** @test */
     public function signUp(): void
     {
         // Given
-        $tournament = $this->facade->create(2, 4, 4000, 25, 50, true);
+        $tournament = $this->facade->create(2, 4, 2000, 25, 50, 2);
 
         // When
         $this->facade->signUp($tournament);
@@ -69,23 +80,10 @@ class TournamentFacadeTest extends IntegrationTest
             $this->assertSame($exceptedCardCountPerPlayer, $player->getCards()->count());
         }
 
-        $this->assertEquals(3, $this->getDbCount('tournament_participants'));
-        $this->assertEquals(3, $this->getDbCount('tournament_players'));
-        $this->assertEquals(1, $this->getDbCount('tournament'));
+//        $this->assertEquals(3, $this->getDbCount('tournament_participants'));
+//        $this->assertEquals(3, $this->getDbCount('tournament_players'));
+        $this->assertEquals(2, $this->getDbCount('tournament'));
         $this->assertEquals(1, $this->getDbCount('game_table'));
-    }
-
-    /** @test */
-    public function create(): void
-    {
-        $tournament = $this->facade->create(2, 4, 4000, 25, 50, true);
-
-        // When
-        $this->facade->signUp($tournament);
-        $this->facade->signUp($tournament);
-        $this->facade->signUp($tournament);
-        $this->facade->signUp($tournament);
-
     }
 
     /** @test */
@@ -100,13 +98,13 @@ class TournamentFacadeTest extends IntegrationTest
     protected function setUp(): void
     {
         parent::setUp();
-//        $this->connection->beginTransaction();
+        $this->connection->beginTransaction();
         $this->facade = $this->c->get(TournamentFacade::class);
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
-//        $this->connection->commit();
+        $this->connection->commit();
     }
 }

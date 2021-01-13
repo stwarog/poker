@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace Integration;
+namespace App\Tests\Integration;
 
 
 use Doctrine\DBAL\Connection;

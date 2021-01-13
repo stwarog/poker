@@ -10,6 +10,7 @@ use App\Game\Tournament\Domain\Rules;
 use App\Game\Tournament\Domain\Tournament;
 use App\Game\Tournament\Domain\TournamentId;
 use App\Game\Tournament\Domain\TournamentRepositoryInterface;
+use App\Shared\Domain\Minutes;
 
 class CreateTournamentService
 {
@@ -25,9 +26,10 @@ class CreateTournamentService
         Chip $chipsPerPlayer,
         Chip $initialSmallBlind,
         Chip $initialBigBlind,
+        Minutes $blindsChangeInterval,
         bool $publish
     ): TournamentId {
-        $r = new Rules($playerCount, $chipsPerPlayer, $initialSmallBlind, $initialBigBlind);
+        $r = new Rules($playerCount, $chipsPerPlayer, $initialSmallBlind, $initialBigBlind, $blindsChangeInterval);
         $t = Tournament::create($r);
 
         if ($publish) {
