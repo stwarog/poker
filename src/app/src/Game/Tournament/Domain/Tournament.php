@@ -134,7 +134,7 @@ class Tournament extends AggregateRoot
 
     public function hasParticipant(PlayerId $participant): bool
     {
-        return false === empty($this->participants->filter(fn(Player $p) => $p->getId()->equals($participant)));
+        return !$this->participants->filter(fn(Player $p) => $p->getId()->equals($participant))->isEmpty();
     }
 
     public function hasPlayer(PlayerId $player): bool
