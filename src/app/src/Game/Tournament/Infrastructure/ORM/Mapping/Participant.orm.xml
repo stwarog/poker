@@ -10,6 +10,9 @@
         </id>
 
         <field name="account" column="account_id" length="80"/>
+        <field name="tournament" column="tournament_id" length="80"/>
+
+        <field name="signUpDate" type="datetime"/>
 
     </entity>
 

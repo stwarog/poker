@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 
-namespace Unit\Game\Tournament\Domain;
+namespace Unit\Game\Table\Domain;
 
 
 use App\Game\Table\Domain\Player;

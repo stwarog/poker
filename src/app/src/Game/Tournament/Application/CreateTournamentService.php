@@ -10,15 +10,18 @@ use App\Game\Tournament\Domain\Rules;
 use App\Game\Tournament\Domain\Tournament;
 use App\Game\Tournament\Domain\TournamentId;
 use App\Game\Tournament\Domain\TournamentRepositoryInterface;
+use App\Shared\Domain\Bus\Event\EventBusInterface;
 use App\Shared\Domain\Minutes;
 
 class CreateTournamentService
 {
     private TournamentRepositoryInterface $repository;
+    private EventBusInterface $bus;
 
-    public function __construct(TournamentRepositoryInterface $repository)
+    public function __construct(TournamentRepositoryInterface $repository, EventBusInterface $bus)
     {
         $this->repository = $repository;
+        $this->bus = $bus;
     }
 
     public function create(
@@ -37,6 +40,8 @@ class CreateTournamentService
         }
 
         $this->repository->save($t);
+
+        $this->bus->publish(...$t->pullDomainEvents());
 
         return $t->getId();
     }

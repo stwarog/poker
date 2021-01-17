@@ -8,6 +8,7 @@ use App\Game\Shared\Domain\Chip;
 use App\Game\Shared\Domain\TableId;
 use App\Game\Tournament\Event\ParticipantSignedIn;
 use App\Game\Tournament\Event\TournamentCreated;
+use App\Game\Tournament\Event\TournamentPublished;
 use App\Game\Tournament\Event\TournamentReadyForJoins;
 use App\Game\Tournament\Event\TournamentStarted;
 use App\Shared\Domain\AggregateRoot;
@@ -32,8 +33,6 @@ class Tournament extends AggregateRoot
     private int $initialSmallBlind;
     private int $initialBigBlind;
     private int $blindsChangeInterval;
-
-    private ?string $table = null;
 
     /** @var Participant[]|Collection */
     private Collection $participants;
@@ -90,18 +89,18 @@ class Tournament extends AggregateRoot
             throw new InvalidArgumentException(sprintf('Tournament has already full amount of participants'));
         }
 
-        $p = Participant::create($account);
+        $p = Participant::create($account, $this->getId());
         $this->participants->set($p->getId()->toString(), $p);
+
+        $this->record(
+            ParticipantSignedIn::create($this->id, $p->getId()->toString(), $account->toString())
+        );
 
         $currentParticipantsCount = $this->participants->count();
         if ($currentParticipantsCount >= $rules->getPlayerCount()->getMin()) {
             $this->status = TournamentStatus::READY;
             $this->record(TournamentReadyForJoins::createEmpty($this->id));
         }
-
-        $this->record(
-            ParticipantSignedIn::create($this->id, $p->getId()->toString(), $account->toString())
-        );
 
         return $p->getId();
     }
@@ -140,8 +139,6 @@ class Tournament extends AggregateRoot
 
         $this->status = TournamentStatus::STARTED;
 
-        $this->table = $table->toString();
-
         $this->record(TournamentStarted::create($this->id, $table->toString()));
     }
 
@@ -157,6 +154,8 @@ class Tournament extends AggregateRoot
         }
 
         $this->status = TournamentStatus::SIGN_UPS;
+
+        $this->record(TournamentPublished::createEmpty($this->id));
     }
 
     public function getStatus(): TournamentStatus
@@ -164,7 +163,7 @@ class Tournament extends AggregateRoot
         return new TournamentStatus($this->status);
     }
 
-    private function hasAccount(AccountId $account)
+    private function hasAccount(AccountId $account): bool
     {
         return !$this->participants->filter(fn(Participant $p) => $p->getAccountId()->equals($account))->isEmpty();
     }

@@ -3,40 +3,49 @@
 namespace App\Game\Tournament\Application;
 
 
+use App\Account\Domain\AccountId;
 use App\Game\Table\Domain\PlayerByIdInterface;
-use App\Game\Table\Domain\PlayerId;
+use App\Game\Tournament\Domain\ParticipantId;
 use App\Game\Tournament\Domain\TournamentByIdInterface;
 use App\Game\Tournament\Domain\TournamentId;
 use App\Game\Tournament\Domain\TournamentRepositoryInterface;
+use App\Shared\Domain\Bus\Event\EventBusInterface;
 use Exception;
 
 class TournamentSignUp
 {
     private TournamentRepositoryInterface $tournamentRepository;
     private PlayerByIdInterface $playerRepository;
+    private EventBusInterface $bus;
 
     public function __construct(
         TournamentByIdInterface $tournamentRepository,
-        PlayerByIdInterface $playerRepository
+        PlayerByIdInterface $playerRepository,
+        EventBusInterface $bus
     ) {
         $this->tournamentRepository = $tournamentRepository;
         $this->playerRepository     = $playerRepository;
+        $this->bus                  = $bus;
     }
 
     /**
-     * @param TournamentId $tournamentId
+     * @param TournamentId $tournament
      *
-     * @return PlayerId
+     * @param AccountId    $account
+     *
+     * @return ParticipantId
      * @throws Exception
      */
-    public function signUp(TournamentId $tournamentId): PlayerId
+    public function signUp(TournamentId $tournament, AccountId $account): ParticipantId
     {
-        $tournament = $this->tournamentRepository->getById($tournamentId);
+        $t = $this->tournamentRepository->getById($tournament);
 
-        $player = $tournament->signUp();
+        $participant = $t->signUp($account);
 
-        $this->tournamentRepository->save($tournament);
+        $this->tournamentRepository->save($t);
 
-        return $player;
+        $this->bus->publish(...$t->pullDomainEvents());
+
+        return $participant;
     }
 }

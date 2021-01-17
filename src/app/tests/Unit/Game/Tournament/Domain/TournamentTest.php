@@ -11,10 +11,10 @@ use App\Game\Tournament\Domain\ParticipantId;
 use App\Game\Tournament\Domain\PlayerCount;
 use App\Game\Tournament\Domain\Rules;
 use App\Game\Tournament\Domain\Tournament;
-use App\Game\Tournament\Domain\TournamentSpecificationInterface;
 use App\Game\Tournament\Domain\TournamentStatus;
 use App\Game\Tournament\Event\ParticipantSignedIn;
 use App\Game\Tournament\Event\TournamentCreated;
+use App\Game\Tournament\Event\TournamentPublished;
 use App\Game\Tournament\Event\TournamentStarted;
 use App\Shared\Domain\AbstractDomainEvent;
 use App\Shared\Domain\Minutes;
@@ -45,7 +45,6 @@ class TournamentTest extends TestCase
     {
         // When
         $t      = Tournament::create();
-        $result = $t->getStatus();
 
         // Then
         $actual = array_filter($t->pullDomainEvents(), fn(AbstractDomainEvent $e) => $e::eventName() === TournamentCreated::eventName());
@@ -53,7 +52,7 @@ class TournamentTest extends TestCase
     }
 
     /** @test */
-    public function publish__tournament(): void
+    public function publish__tournament__status_changes_to_sign_ups(): void
     {
         // When
         $t        = Tournament::create();
@@ -62,6 +61,18 @@ class TournamentTest extends TestCase
 
         // Then
         $this->assertTrue($expected->equals($t->getStatus()));
+    }
+
+    /** @test */
+    public function publish__event_recorded(): void
+    {
+        // When
+        $t        = Tournament::create();
+        $t->publish();
+
+        // Then
+        $actual = array_filter($t->pullDomainEvents(), fn(AbstractDomainEvent $e) => $e::eventName() === TournamentPublished::eventName());
+        $this->assertNotEmpty($actual);
     }
 
     /** @test */
@@ -110,7 +121,7 @@ class TournamentTest extends TestCase
     }
 
     /** @test */
-    public function signUp__has_participants__ok(): void
+    public function signUp__has_participants(): void
     {
         // Given
         $expectedCount          = 2;

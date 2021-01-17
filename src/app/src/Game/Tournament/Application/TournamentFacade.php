@@ -4,6 +4,7 @@
 namespace App\Game\Tournament\Application;
 
 
+use App\Account\Domain\AccountId;
 use App\Game\Shared\Domain\Chip;
 use App\Game\Table\Domain\PlayerId;
 use App\Game\Tournament\Domain\PlayerCount;
@@ -64,17 +65,19 @@ final class TournamentFacade
 
     /**
      * @param string $tournamentId
+     * @param string $accountId
      *
      * @return string
      * @throws Exception
      */
-    public function signUp(string $tournamentId): string
+    public function signUp(string $tournamentId, string $accountId): string
     {
-        $player = $this->tournamentSignUpService->signUp(
-            TournamentId::fromString($tournamentId)
+        $participate = $this->tournamentSignUpService->signUp(
+            TournamentId::fromString($tournamentId),
+            AccountId::fromString($accountId),
         );
 
-        return $player->toString();
+        return $participate->toString();
     }
 
     /**
@@ -168,12 +171,12 @@ final class TournamentFacade
 
     public function getTableView(string $tournamentId): ?TableView
     {
-        $t = $this->repository->getById(TournamentId::fromString($tournamentId));
-
-        if (empty($t->getTable())) {
-            return null;
-        }
-
-        return $this->tableViewRepository->getById($t->getTable());
+//        $t = $this->repository->getById(TournamentId::fromString($tournamentId));
+//
+//        if (empty($t->getTable())) {
+//            return null;
+//        }
+//
+//        return $this->tableViewRepository->getById($t->getTable());
     }
 }
