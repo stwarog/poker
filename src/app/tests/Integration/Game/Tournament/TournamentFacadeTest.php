@@ -41,27 +41,27 @@ class TournamentFacadeTest extends IntegrationTest
         $this->assertEquals(0, $this->getDbCount('game_table'));
     }
 
-    /** @test */
-    public function join(): void
-    {
-        // Given
-        $tournament = $this->facade->create(2, 4, 4000, 25, 50, true);
-
-        $account1 = AccountId::create();
-        $account2 = AccountId::create();
-
-        // When
-        $player1 = $this->facade->signUp($tournament, $account1->toString());
-        $player2 = $this->facade->signUp($tournament, $account2->toString());
-        $this->facade->join($tournament, $player1);
-        $this->facade->join($tournament, $player2);
-
-        // Then
-        $this->assertEquals(2, $this->getDbCount('participant'));
-        $this->assertEquals(2, $this->getDbCount('player'));
-        $this->assertEquals(1, $this->getDbCount('tournament'));
-        $this->assertEquals(0, $this->getDbCount('game_table'));
-    }
+//    /** @test */
+//    public function join(): void
+//    {
+//        // Given
+//        $tournament = $this->facade->create(2, 4, 4000, 25, 50, 2, true);
+//
+//        $account1 = AccountId::create();
+//        $account2 = AccountId::create();
+//
+//        // When
+//        $player1 = $this->facade->signUp($tournament, $account1->toString());
+//        $player2 = $this->facade->signUp($tournament, $account2->toString());
+//        $this->facade->join($tournament, $player1);
+//        $this->facade->join($tournament, $player2);
+//
+//        // Then
+//        $this->assertEquals(2, $this->getDbCount('participant'));
+//        $this->assertEquals(2, $this->getDbCount('player'));
+//        $this->assertEquals(1, $this->getDbCount('tournament'));
+//        $this->assertEquals(0, $this->getDbCount('game_table'));
+//    }
 
 //    /** @test */
 //    public function start(): void

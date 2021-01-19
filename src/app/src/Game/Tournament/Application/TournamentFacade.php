@@ -19,7 +19,6 @@ final class TournamentFacade
     private CreateTournamentService $createTournamentService;
     private TournamentSignUp $tournamentSignUpService;
     private JoinTournamentService $joinTournamentService;
-    private StartTournamentService $startTournamentService;
     private TournamentByIdInterface $repository;
     private TournamentDecisionService $decisionService;
     private TableViewRepositoryInterface $tableViewRepository;
@@ -30,13 +29,11 @@ final class TournamentFacade
         TournamentSignUp $tournamentSignUpService,
         TournamentByIdInterface $repository,
         TournamentDecisionService $decisionService,
-        TableViewRepositoryInterface $tableViewRepository,
-        StartTournamentService $startTournamentService
+        TableViewRepositoryInterface $tableViewRepository
     ) {
         $this->createTournamentService = $createTournamentService;
         $this->tournamentSignUpService = $tournamentSignUpService;
         $this->joinTournamentService   = $joinTournamentService;
-        $this->startTournamentService  = $startTournamentService;
         $this->repository              = $repository;
         $this->decisionService         = $decisionService;
         $this->tableViewRepository     = $tableViewRepository;
@@ -94,17 +91,17 @@ final class TournamentFacade
         );
     }
 
-    /**
-     * @param string $tournamentId
-     *
-     * @throws Exception
-     */
-    public function start(string $tournamentId): void
-    {
-        $this->startTournamentService->start(
-            TournamentId::fromString($tournamentId)
-        );
-    }
+//    /**
+//     * @param string $tournamentId
+//     *
+//     * @throws Exception
+//     */
+//    public function start(string $tournamentId): void
+//    {
+//        $this->startTournamentService->start(
+//            TournamentId::fromString($tournamentId)
+//        );
+//    }
 
     /**
      * @param string $tournamentId
